@@ -14,10 +14,10 @@ public class BattleDisplay extends JFrame {
 	public static final int margin = 5;
 	
 	//Area of the battlefield covered by the screen
-	public float minX;
-	public float maxX;
-	public float minY;
-	public float maxY;
+	public double minX;
+	public double maxX;
+	public double minY;
+	public double maxY;
 	
 	ArrayList<Guy> guys;
 	
@@ -39,12 +39,12 @@ public class BattleDisplay extends JFrame {
 		this.setSize(WIDTH, HEIGHT);
 		this.setVisible(true);
 	}
-	public boolean inbounds(float x, float y)
+	public boolean inbounds(Vector2 v)
 	{
-		return (x >= (minX - margin))
-			 &&(y >= (minY - margin))
-			 &&(x <= (maxX + margin))
-			 &&(y <= (maxY + margin));  
+		return (v.x >= (minX - margin))
+			 &&(v.y >= (minY - margin))
+			 &&(v.x <= (maxX + margin))
+			 &&(v.y <= (maxY + margin));  
 	}
 	public void paint(Graphics graphics){
 		Image image = createImage(WIDTH, HEIGHT);
@@ -54,12 +54,12 @@ public class BattleDisplay extends JFrame {
 		
 		int radius = (int)(Guy.radius * WIDTH / (maxX - minX));
 		for(Guy guy: guys) {
-			if(inbounds(guy.x, guy.y))
+			if(inbounds(guy.p))
 			{
 				g.setColor(new Color(guy.rgb));
 				//Convert world units to pixels
-				int x = (int)((guy.x - minX) * WIDTH / (maxX - minX));
-				int y = (int)((guy.y - minY) * HEIGHT / (maxY - minY));
+				int x = (int)((guy.p.x - minX) * WIDTH / (maxX - minX));
+				int y = (int)((guy.p.y - minY) * HEIGHT / (maxY - minY));
 				g.fillOval(x - radius, y - radius, radius*2, radius*2);
 			}
 		}

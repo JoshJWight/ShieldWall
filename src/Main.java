@@ -17,7 +17,7 @@ public class Main {
 		for(int i=0; i<100; i++)
 		{
 			Guy guy = new Guy(rand.nextInt(120), rand.nextInt(120), rand.nextInt());
-			guy.rgb = (rand.nextFloat() > 0.5f) ? Color.RED.getRGB() : Color.BLUE.getRGB();
+			guy.rgb = (rand.nextDouble() > 0.5f) ? Color.RED.getRGB() : Color.BLUE.getRGB();
 			list.add(guy);
 		}
 		
@@ -47,9 +47,24 @@ public class Main {
 				}
 				guyAI(guy, allies, enemies);
 				
-				guy.x += guy.xv;
-				guy.y += guy.yv;
-				System.out.println("guy at " + guy.x + ", " + guy.y + " with speed " + guy.xv + ", " + guy.yv);
+				Vector2 newP = new Vector2(guy.p).add(guy.v);
+				boolean collide = false;
+				for(Guy other: list)
+				{
+					if(other != guy && other.dist(newP) < Guy.personalSpace)
+					{
+						collide = true;
+					}
+				}
+				if(!collide)
+				{
+					guy.p = newP;
+				}
+				else
+				{
+					guy.v.mul(-1.0);
+				}
+				System.out.println("guy at " + guy.p.x + ", " + guy.p.y + " with speed " + guy.v.x + ", " + guy.v.y);
 				//TODO collision detection
 			}
 			display.repaint();
@@ -67,40 +82,36 @@ public class Main {
 	public static void guyAI(Guy guy, ArrayList<Guy> allies, ArrayList<Guy> enemies)
 	{
 		//TODO Have guys respect personal space?
+		Vector2 desired;
 		
-		float desiredX = 0;
-		float desiredY = 0;
 		//TODO use a class member here
 		Random rand = new Random();
 		
 		//Move at random if no one is visible (does this happen much?)
 		if(allies.isEmpty() && enemies.isEmpty())
 		{
-			desiredX = rand.nextFloat();
-			desiredY = rand.nextFloat();
+			desired = new Vector2(rand.nextDouble(), rand.nextDouble());
+			desired.x = rand.nextDouble();
+			desired.y = rand.nextDouble();
 		}
 		//Run away from enemies if no allies are visible
 		else if(allies.isEmpty())
 		{
-			float xThreat = 0;
-			float yThreat = 0;
+			Vector2 threat = Vector2.zero();
 			for(Guy enemy: enemies)
 			{
-				float xDiff = enemy.x - guy.x;
-				float yDiff = enemy.y - guy.y;
+				Vector2 diff = new Vector2(enemy.p).sub(guy.p);
 				
 				//TODO make closer enemies more threatening instead of vice versa
 				//Without dividing by zero
-				xThreat += (xDiff);
-				yThreat += (yDiff);
+				threat.add(diff);
 			}
-			desiredX = - xThreat;
-			desiredY = - yThreat;
+			desired = threat.mul(-1.0);
 		}
 		else
 		{
 			ArrayList<Guy> nearbyAllies = new ArrayList<Guy>();
-			float maxDistance = 3;
+			double maxDistance = 3;
 			for(Guy ally: allies)
 			{
 				if(guy.dist(ally) < maxDistance)
@@ -114,28 +125,21 @@ public class Main {
 			if(nearbyAllies.size() < minNearby)
 			{
 				//TODO not DRY - make a function that does this
-				float xThreat = 0;
-				float yThreat = 0;
+				Vector2 charm = Vector2.zero();
 				for(Guy ally: allies)
 				{
-					float xDiff = ally.x - guy.x;
-					float yDiff = ally.y - guy.y;
-					
 					//TODO prefer closer allies to farther ones
-					
-					xThreat += (xDiff);
-					yThreat += (yDiff);
+					charm.add(ally.p).sub(guy.p);
 				}
-				desiredX = xThreat;
-				desiredY = yThreat;
+				desired = charm;
 			}
 			//Match velocities of nearby allies if no enemies are visible
 			else if(enemies.isEmpty())
 			{
+				desired = Vector2.zero();
 				for(Guy ally: nearbyAllies)
 				{
-					desiredX += ally.xv;
-					desiredY += ally.yv;
+					desired.add(ally.v);
 				}
 			}
 			//Move toward closest enemy if enough allies are close
@@ -149,12 +153,11 @@ public class Main {
 						closest = enemy;
 					}
 				}
-				desiredX = closest.x - guy.x;
-				desiredY = closest.y - guy.y;
+				desired = new Vector2(closest.p).sub(guy.p);
 			}
 		}
 		
-		guy.updateVelocity(desiredX, desiredY);
+		guy.updateVelocity(desired);
 	}
 
 }
