@@ -11,6 +11,7 @@ public class Guy {
 	public static final int maxStam = 10;
 	
 	public static final double radius = 1;
+	public static final double hpRadius = 0.5;
 	
 	public static final double maxSpeed = 0.2f;
 	public static final double acceleration = 0.02f;

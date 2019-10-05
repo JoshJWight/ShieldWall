@@ -21,6 +21,8 @@ public class BattleDisplay extends JFrame {
 	
 	ArrayList<Guy> guys;
 	
+	ArrayList<Color> hpColors;
+	
 	public BattleDisplay(ArrayList<Guy> guys, int minX, int minY, int maxX, int maxY)
 	{
 		this.minX = minX;
@@ -28,6 +30,14 @@ public class BattleDisplay extends JFrame {
 		this.maxX = maxX;
 		this.maxY = maxY;
 		this.guys = guys;
+		
+		//Precompute colors for all hp values
+		hpColors = new ArrayList<Color>();
+		for(int i=0; i<= Guy.maxHp; i++)
+		{
+			float fraction = ((float)i)/Guy.maxHp;
+			hpColors.add(new Color(1.0f, fraction, fraction));
+		}
 		
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -53,6 +63,7 @@ public class BattleDisplay extends JFrame {
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		int radius = (int)(Guy.radius * WIDTH / (maxX - minX));
+		int hpRadius = (int)(Guy.hpRadius * WIDTH / (maxX - minX));
 		for(Guy guy: guys) {
 			if(inbounds(guy.p))
 			{
@@ -61,6 +72,8 @@ public class BattleDisplay extends JFrame {
 				int x = (int)((guy.p.x - minX) * WIDTH / (maxX - minX));
 				int y = (int)((guy.p.y - minY) * HEIGHT / (maxY - minY));
 				g.fillOval(x - radius, y - radius, radius*2, radius*2);
+				g.setColor(hpColors.get(guy.hp));
+				g.fillOval(x - hpRadius, y - hpRadius, hpRadius*2, hpRadius*2);
 			}
 		}
 		
