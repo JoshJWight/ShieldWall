@@ -64,8 +64,6 @@ public class Main {
 				{
 					guy.v.mul(-1.0);
 				}
-				System.out.println("guy at " + guy.p.x + ", " + guy.p.y + " with speed " + guy.v.x + ", " + guy.v.y);
-				//TODO collision detection
 			}
 			display.repaint();
 			
@@ -83,6 +81,7 @@ public class Main {
 	{
 		//TODO Have guys respect personal space?
 		Vector2 desired;
+		double desiredBearing;
 		
 		//TODO use a class member here
 		Random rand = new Random();
@@ -91,8 +90,7 @@ public class Main {
 		if(allies.isEmpty() && enemies.isEmpty())
 		{
 			desired = new Vector2(rand.nextDouble(), rand.nextDouble());
-			desired.x = rand.nextDouble();
-			desired.y = rand.nextDouble();
+			desiredBearing = rand.nextDouble() * Math.PI;
 		}
 		//Run away from enemies if no allies are visible
 		else if(allies.isEmpty())
@@ -106,6 +104,8 @@ public class Main {
 				//Without dividing by zero
 				threat.add(diff);
 			}
+			//face back to the enemies while retreating
+			desiredBearing = Math.atan2(threat.y, threat.x);
 			desired = threat.mul(-1.0);
 		}
 		else
@@ -131,6 +131,7 @@ public class Main {
 					//TODO prefer closer allies to farther ones
 					charm.add(ally.p).sub(guy.p);
 				}
+				desiredBearing = Math.atan2(charm.y, charm.x);
 				desired = charm;
 			}
 			//Match velocities of nearby allies if no enemies are visible
@@ -141,6 +142,7 @@ public class Main {
 				{
 					desired.add(ally.v);
 				}
+				desiredBearing = Math.atan2(desired.y, desired.x);
 			}
 			//Move toward closest enemy if enough allies are close
 			else
@@ -154,9 +156,10 @@ public class Main {
 					}
 				}
 				desired = new Vector2(closest.p).sub(guy.p);
+				desiredBearing = Math.atan2(desired.y, desired.x);
 			}
 		}
-		
+		guy.updateBearing(desiredBearing);
 		guy.updateVelocity(desired);
 	}
 
