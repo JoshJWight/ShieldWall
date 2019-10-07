@@ -21,9 +21,17 @@ public class Guy {
 	
 	public static final double personalSpace = 2.5;
 	
+	public static final double attackReach = 2.5;
+	
 	public int rgb;
 	
-	public Guy(double x, double y, int rgb){
+	public int initiative;
+	public int attackTimer;
+	public static final int maxAttackTimer = 10;
+	public int deathTimer;
+	public static final int maxDeathTimer = 50;
+	
+	public Guy(double x, double y, int initiative, int rgb){
 		this.p = new Vector2(x, y);
 		this.v = Vector2.zero();
 		this.rgb = rgb;
@@ -31,6 +39,8 @@ public class Guy {
 		hp = maxHp;
 		
 		stam = maxStam;
+		
+		this.initiative = initiative;
 	}
 	
 	//Note: this alters the argument

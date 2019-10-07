@@ -67,7 +67,14 @@ public class BattleDisplay extends JFrame {
 		for(Guy guy: guys) {
 			if(inbounds(guy.p))
 			{
-				g.setColor(new Color(guy.rgb));
+				Color guyColor = new Color(guy.rgb);
+				
+				if(guy.deathTimer > 0)
+				{
+					guyColor = new Color(guyColor.getRed(), guyColor.getGreen(), guyColor.getBlue(), 
+							(255 * guy.deathTimer) / Guy.maxDeathTimer);
+				}
+				g.setColor(guyColor);
 				//Convert world units to pixels
 				int x = (int)((guy.p.x - minX) * WIDTH / (maxX - minX));
 				int y = (int)((guy.p.y - minY) * HEIGHT / (maxY - minY));
@@ -77,13 +84,19 @@ public class BattleDisplay extends JFrame {
 				//Health
 				g.setColor(hpColors.get(guy.hp));
 				g.fillOval(x - hpRadius, y - hpRadius, hpRadius*2, hpRadius*2);
-				//Bearing
+				//Bearing / attack
+				double lineTip = 7.0/6.0;
+				if(guy.attackTimer > 0)
+				{
+					lineTip = guy.attackReach;
+				}
+				
 				double sin = Math.sin(guy.bearingRad) * ((double)radius);
 				double cos = Math.cos(guy.bearingRad) * ((double)radius);
 				int inX = x + (int)(cos * 5.0/6.0);
 				int inY = y + (int)(sin * 5.0/6.0);
-				int outX = x + (int)(cos * 7.0/6.0);
-				int outY = y + (int)(sin * 7.0/6.0);
+				int outX = x + (int)(cos * lineTip);
+				int outY = y + (int)(sin * lineTip);
 				g.drawLine(inX, inY, outX, outY);
 			}
 		}

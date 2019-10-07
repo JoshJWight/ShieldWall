@@ -4,22 +4,28 @@ import java.util.Random;
 import java.awt.Color;
 
 
-public class Main {
 
+public class Main {
+	static final int attackCycle = 30;
 	//TODO move most of this stuff out of Main
 	public static void main(String[] args) {
 		ArrayList<Guy> list = new ArrayList<Guy>();
 		
-		BattleDisplay display = new BattleDisplay(list, -50, -50, 250, 150);
+		BattleDisplay display = new BattleDisplay(list, 0, 0, 120, 80);
 		
 		Random rand = new Random();
 		
-		for(int i=0; i<100; i++)
+		int nGuys = 200;
+		
+		for(int i=0; i<nGuys; i++)
 		{
-			Guy guy = new Guy(rand.nextInt(120), rand.nextInt(120), rand.nextInt());
-			guy.rgb = (rand.nextDouble() > 0.5f) ? Color.RED.getRGB() : Color.BLUE.getRGB();
+			int rgb = (rand.nextDouble() > 0.4935f) ? Color.RED.getRGB() : Color.BLUE.getRGB();
+			int initiative = rand.nextInt(attackCycle);
+			Guy guy = new Guy(rand.nextInt(120), rand.nextInt(80), initiative, rgb);
 			list.add(guy);
 		}
+		
+		int timer = 0;
 		
 		while(true)
 		{
@@ -27,44 +33,69 @@ public class Main {
 			ArrayList<Guy> allies = new ArrayList<Guy>();
 			ArrayList<Guy> enemies = new ArrayList<Guy>();
 			
+			ArrayList<Guy> vanishing = new ArrayList<Guy>();
+			
 			for(Guy guy: list)
 			{
-				allies.clear();
-				enemies.clear();
+				if(guy.attackTimer > 0)
+				{
+					guy.attackTimer--;
+				}
+				if(guy.deathTimer > 0)
+				{
+					guy.deathTimer--;
+				}
 				
-				//TODO use magic algorithm to pare this down to only nearest neighbors
-				//Preferably in sqrt(n) or log(n) or constant time
-				for(Guy other: list)
+				if(guy.hp > 0)
 				{
-					if(other.rgb == guy.rgb && other != guy)
-					{
-						allies.add(other);
-					}
-					else if(other.rgb != guy.rgb)
-					{
-						enemies.add(other);
-					}
-				}
-				guyAI(guy, allies, enemies);
+					allies.clear();
+					enemies.clear();
 				
-				Vector2 newP = new Vector2(guy.p).add(guy.v);
-				boolean collide = false;
-				for(Guy other: list)
-				{
-					if(other != guy && other.dist(newP) < Guy.personalSpace)
+					//TODO use magic algorithm to pare this down to only nearest neighbors
+					//Preferably in sqrt(n) or log(n) or constant time
+					for(Guy other: list)
 					{
-						collide = true;
+						if(other.rgb == guy.rgb && other != guy)
+						{
+							allies.add(other);
+						}
+						else if(other.rgb != guy.rgb)
+						{
+							enemies.add(other);
+						}
+					}
+				
+					guyAI(guy, allies, enemies, timer);
+				
+					Vector2 newP = new Vector2(guy.p).add(guy.v);
+					boolean collide = false;
+					for(Guy other: list)
+					{
+						if(other != guy && other.dist(newP) < Guy.personalSpace)
+						{
+							collide = true;
+						}
+					}
+					if(!collide)
+					{
+						guy.p = newP;
+					}
+					else
+					{
+						guy.v.mul(-1.0);
 					}
 				}
-				if(!collide)
+				else if(guy.hp<=0 && guy.deathTimer == 0)
 				{
-					guy.p = newP;
-				}
-				else
-				{
-					guy.v.mul(-1.0);
+					vanishing.add(guy);
 				}
 			}
+			
+			for(Guy guy: vanishing)
+			{
+				list.remove(guy);
+			}
+			
 			display.repaint();
 			
 			try {
@@ -73,11 +104,11 @@ public class Main {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			timer = (timer + 1) % attackCycle;
 		}
-
 	}
 	//TODO move out into separate class
-	public static void guyAI(Guy guy, ArrayList<Guy> allies, ArrayList<Guy> enemies)
+	public static void guyAI(Guy guy, ArrayList<Guy> allies, ArrayList<Guy> enemies, int timer)
 	{
 		//TODO Have guys respect personal space?
 		Vector2 desired;
@@ -111,7 +142,7 @@ public class Main {
 		else
 		{
 			ArrayList<Guy> nearbyAllies = new ArrayList<Guy>();
-			double maxDistance = 3;
+			double maxDistance = 10;
 			for(Guy ally: allies)
 			{
 				if(guy.dist(ally) < maxDistance)
@@ -161,6 +192,24 @@ public class Main {
 		}
 		guy.updateBearing(desiredBearing);
 		guy.updateVelocity(desired);
+		
+		//Attack
+		if(timer == guy.initiative && !enemies.isEmpty())
+		{
+			Vector2 targetPoint = new Vector2(guy.p).addPolar(Guy.attackReach, guy.bearingRad);
+			for(Guy enemy: enemies)
+			{
+				if(enemy.hp > 0 && enemy.dist(targetPoint) < Guy.radius)
+				{
+					guy.attackTimer = Guy.maxAttackTimer;
+					enemy.hp --;
+					if(enemy.hp == 0)
+					{
+						enemy.deathTimer = Guy.maxDeathTimer;
+					}
+				}
+			}
+		}
 	}
 
 }

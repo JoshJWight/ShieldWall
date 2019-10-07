@@ -50,4 +50,16 @@ public class Vector2 {
 	{
 		return this.mul(1.0 / this.magnitude());
 	}
+	
+	public Vector2 addPolar(double r, double theta)
+	{
+		x += Math.cos(theta) * r;
+		y += Math.sin(theta) * r;
+		return this;
+	}
+	//Notation here is that polar coords are (r, theta)
+	public Vector2 addPolar(Vector2 polar)
+	{
+		return addPolar(polar.x, polar.y);
+	}
 }
