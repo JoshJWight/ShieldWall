@@ -22,7 +22,8 @@ public class BattleDisplay extends JFrame {
 	ArrayList<Guy> guys;
 	
 	ArrayList<Color> hpColors;
-	
+	ArrayList<Color> shieldColors;
+ 	
 	public BattleDisplay(ArrayList<Guy> guys, int minX, int minY, int maxX, int maxY)
 	{
 		this.minX = minX;
@@ -35,8 +36,14 @@ public class BattleDisplay extends JFrame {
 		hpColors = new ArrayList<Color>();
 		for(int i=0; i<= Guy.maxHp; i++)
 		{
-			float fraction = ((float)i)/Guy.maxHp;
+			float fraction = ((float)i)/((float)Guy.maxHp);
 			hpColors.add(new Color(1.0f, fraction, fraction));
+		}
+		shieldColors = new ArrayList<Color>();
+		for(int i=0; i<= Guy.maxStam; i++)
+		{
+			float fraction = ((float) i) / ((float)Guy.maxStam);
+			shieldColors.add(new Color(1.0f - fraction, fraction, 0.5f));
 		}
 		
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -49,6 +56,22 @@ public class BattleDisplay extends JFrame {
 		this.setSize(WIDTH, HEIGHT);
 		this.setVisible(true);
 	}
+	
+	//Convert to screen coords. Wanted short names since we'll use these a lot
+	//TODO could precompute some of this stuff
+	int sx(double worldX)
+	{
+		return (int)((worldX - minX) * WIDTH / (maxX - minX));
+	}
+	int sy(double worldY)
+	{
+		return (int)((worldY - minY) * HEIGHT / (maxY - minY));
+	}
+	int ss(double worldScalar)
+	{
+		return (int)(worldScalar * WIDTH / (maxX - minX));
+	}
+	
 	public boolean inbounds(Vector2 v)
 	{
 		return (v.x >= (minX - margin))
@@ -62,42 +85,57 @@ public class BattleDisplay extends JFrame {
 		g.setColor(Color.black);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
-		int radius = (int)(Guy.radius * WIDTH / (maxX - minX));
-		int hpRadius = (int)(Guy.hpRadius * WIDTH / (maxX - minX));
 		for(Guy guy: guys) {
 			if(inbounds(guy.p))
 			{
+				//Body
 				Color guyColor = new Color(guy.rgb);
-				
 				if(guy.deathTimer > 0)
 				{
 					guyColor = new Color(guyColor.getRed(), guyColor.getGreen(), guyColor.getBlue(), 
 							(255 * guy.deathTimer) / Guy.maxDeathTimer);
 				}
 				g.setColor(guyColor);
-				//Convert world units to pixels
-				int x = (int)((guy.p.x - minX) * WIDTH / (maxX - minX));
-				int y = (int)((guy.p.y - minY) * HEIGHT / (maxY - minY));
+				g.fillOval(
+						sx(guy.p.x - Guy.radius), 
+						sy(guy.p.y - Guy.radius), 
+						ss(Guy.radius*2.0),
+						ss(Guy.radius*2.0));
 				
-				//Body
-				g.fillOval(x - radius, y - radius, radius*2, radius*2);
 				//Health
 				g.setColor(hpColors.get(guy.hp));
-				g.fillOval(x - hpRadius, y - hpRadius, hpRadius*2, hpRadius*2);
+				g.fillOval(
+						sx(guy.p.x - Guy.hpRadius),
+						sy(guy.p.y - Guy.hpRadius), 
+						ss(Guy.hpRadius*2.0), 
+						ss(Guy.hpRadius*2.0));
+				
 				//Bearing / attack
-				double lineTip = 7.0/6.0;
+				double lineTip = Guy.radius * 7.0/6.0;
 				if(guy.attackTimer > 0)
 				{
 					lineTip = guy.attackReach;
 				}
+				Vector2 wepIn = new Vector2(guy.p).addPolar(Guy.radius * 5.0/6.0, guy.bearingRad);
+				Vector2 wepOut = new Vector2(guy.p).addPolar(Guy.radius * lineTip, guy.bearingRad);
+				g.drawLine(
+						sx(wepIn.x),
+						sy(wepIn.y),
+						sx(wepOut.x),
+						sy(wepOut.y));
 				
-				double sin = Math.sin(guy.bearingRad) * ((double)radius);
-				double cos = Math.cos(guy.bearingRad) * ((double)radius);
-				int inX = x + (int)(cos * 5.0/6.0);
-				int inY = y + (int)(sin * 5.0/6.0);
-				int outX = x + (int)(cos * lineTip);
-				int outY = y + (int)(sin * lineTip);
-				g.drawLine(inX, inY, outX, outY);
+				//Shield
+				g.setColor(shieldColors.get(guy.stam));				
+				//This is the hypotenuse of a triangle where the other sides are the radius and half the shield
+				double lenToShield = Guy.radius / Math.sin(Guy.halfShieldRad);
+				//dunno if this left/right is correct but doesn't really matter
+				Vector2 shieldRight = new Vector2(guy.p).addPolar(lenToShield, guy.bearingRad + Guy.halfShieldRad);
+				Vector2 shieldLeft = new Vector2(guy.p).addPolar(lenToShield, guy.bearingRad - Guy.halfShieldRad);
+				g.drawLine(
+						sx(shieldRight.x),
+						sy(shieldRight.y),
+						sx(shieldLeft.x),
+						sy(shieldLeft.y));
 			}
 		}
 		

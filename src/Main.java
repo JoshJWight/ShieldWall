@@ -19,9 +19,9 @@ public class Main {
 		
 		for(int i=0; i<nGuys; i++)
 		{
-			int rgb = (rand.nextDouble() > 0.4935f) ? Color.RED.getRGB() : Color.BLUE.getRGB();
+			int rgb = (i%2==0) ? Color.RED.getRGB() : Color.BLUE.getRGB();
 			int initiative = rand.nextInt(attackCycle);
-			Guy guy = new Guy(rand.nextInt(120), rand.nextInt(80), initiative, rgb);
+			Guy guy = new Guy(rand.nextInt(120), rand.nextInt(40) + ((i%2)*40), initiative, rgb);
 			list.add(guy);
 		}
 		
@@ -45,6 +45,18 @@ public class Main {
 				{
 					guy.deathTimer--;
 				}
+				if(guy.stamRegenTimer > 0)
+				{
+					guy.stamRegenTimer--;
+					if(guy.stamRegenTimer ==0)
+					{
+						guy.stam++;
+						if(guy.stam < Guy.maxStam)
+						{
+							guy.stamRegenTimer = Guy.maxStamRegenTimer;
+						}
+					}
+				}
 				
 				if(guy.hp > 0)
 				{
@@ -64,14 +76,13 @@ public class Main {
 							enemies.add(other);
 						}
 					}
-				
 					guyAI(guy, allies, enemies, timer);
-				
+					
 					Vector2 newP = new Vector2(guy.p).add(guy.v);
 					boolean collide = false;
 					for(Guy other: list)
 					{
-						if(other != guy && other.dist(newP) < Guy.personalSpace)
+						if(other != guy && other.dist(newP) < Guy.personalSpace && other.dist(guy.p) > Guy.personalSpace)
 						{
 							collide = true;
 						}
@@ -202,10 +213,21 @@ public class Main {
 				if(enemy.hp > 0 && enemy.dist(targetPoint) < Guy.radius)
 				{
 					guy.attackTimer = Guy.maxAttackTimer;
-					enemy.hp --;
-					if(enemy.hp == 0)
+					if(enemy.shieldedFrom(guy.p))
 					{
-						enemy.deathTimer = Guy.maxDeathTimer;
+						enemy.stam --;
+					}
+					else
+					{
+						enemy.hp --;
+						if(enemy.hp == 0)
+						{
+							enemy.deathTimer = Guy.maxDeathTimer;
+						}
+					}
+					if(enemy.stam < Guy.maxStam)
+					{
+						enemy.stamRegenTimer = Guy.maxStamRegenTimer;
 					}
 				}
 			}

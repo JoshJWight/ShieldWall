@@ -30,6 +30,10 @@ public class Guy {
 	public static final int maxAttackTimer = 10;
 	public int deathTimer;
 	public static final int maxDeathTimer = 50;
+	public int stamRegenTimer;
+	public static final int maxStamRegenTimer = 50;
+	
+	public static final double halfShieldRad = Math.PI/4;
 	
 	public Guy(double x, double y, int initiative, int rgb){
 		this.p = new Vector2(x, y);
@@ -45,9 +49,18 @@ public class Guy {
 	
 	//Note: this alters the argument
 	public void updateVelocity(Vector2 desired)
-	{
-		double dMag = desired.magnitude();
-		if(dMag==0) dMag = 0.0001f;
+	{	
+		//Interpret a zero vector as a request to slow to a stop
+		if(desired.x == 0 && desired.y == 0)
+		{
+			//If already stopped, mission accomplished, do nothing
+			if(v.x == 0 && v.y == 0)
+			{
+				return;
+			}
+			//Otherwise, set the desired to the reverse of current course
+			desired.add(v).mul(-1);
+		}
 		
 		desired.normalize();
 		desired.mul(acceleration);
@@ -95,6 +108,17 @@ public class Guy {
 	public double dist(Vector2 pos)
 	{
 		return new Vector2(p).sub(pos).magnitude();
+	}
+	
+	public boolean shieldedFrom(Vector2 pos)
+	{
+		if(stam<=0)
+		{
+			return false;
+		}
+		double posBearing = Math.atan2(pos.y - p.y, pos.x - p.x);
+		double diff = recenterBearing(bearingRad - posBearing);
+		return (diff < halfShieldRad) && (diff > -halfShieldRad);
 	}
 	
 }
