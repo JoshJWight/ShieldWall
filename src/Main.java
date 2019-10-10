@@ -7,6 +7,7 @@ import java.awt.Color;
 
 public class Main {
 	static final int attackCycle = 30;
+	static final int frameTimeMs = 20;
 	//TODO move most of this stuff out of Main
 	public static void main(String[] args) {
 		ArrayList<Guy> list = new ArrayList<Guy>();
@@ -15,13 +16,17 @@ public class Main {
 		
 		Random rand = new Random();
 		
-		int nGuys = 200;
+		int nGuys = 1000;
+		
+		int prepHeight = 200;
+		int prepWidth = 200;
+		int noMansLand = 60;
 		
 		for(int i=0; i<nGuys; i++)
 		{
 			int rgb = (i%2==0) ? Color.RED.getRGB() : Color.BLUE.getRGB();
 			int initiative = rand.nextInt(attackCycle);
-			Guy guy = new Guy(rand.nextInt(120), rand.nextInt(40) + ((i%2)*40), initiative, rgb);
+			Guy guy = new Guy(rand.nextInt(prepWidth), rand.nextInt(prepHeight) + ((i%2)*(prepHeight + noMansLand)), initiative, rgb);
 			list.add(guy);
 		}
 		
@@ -29,7 +34,7 @@ public class Main {
 		
 		while(true)
 		{
-			
+			long startTime = System.currentTimeMillis();
 			ArrayList<Guy> allies = new ArrayList<Guy>();
 			ArrayList<Guy> enemies = new ArrayList<Guy>();
 			
@@ -115,9 +120,12 @@ public class Main {
 			
 			display.repaint();
 			
+			long endTime = System.currentTimeMillis();
+			
+			//System.out.println("Frame processing time: " + (endTime - startTime));
+			
 			try {
-				//TODO only sleep remainder of frame time
-				Thread.sleep(20);
+				Thread.sleep(Math.max((20 - (endTime - startTime)), 0));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

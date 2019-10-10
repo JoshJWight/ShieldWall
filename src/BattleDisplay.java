@@ -2,11 +2,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-public class BattleDisplay extends JFrame {
+public class BattleDisplay extends JFrame implements KeyListener {
 	public static final int START_WIDTH = 1000;
 	public static final int START_HEIGHT = 600;
 	
@@ -37,10 +39,11 @@ public class BattleDisplay extends JFrame {
 			hpColors.add(new Color(1.0f, fraction, fraction));
 		}
 		shieldColors = new ArrayList<Color>();
+		shieldColors.add(Color.RED);
 		for(int i=0; i<= Guy.maxStam; i++)
 		{
 			float fraction = ((float) i) / ((float)Guy.maxStam);
-			shieldColors.add(new Color(1.0f - fraction, fraction, 0.5f));
+			shieldColors.add(new Color(1.0f - fraction, fraction, 1.0f - fraction));
 		}
 		
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -51,6 +54,7 @@ public class BattleDisplay extends JFrame {
 		
 		this.setTitle("Shield Wall");
 		this.setSize(START_WIDTH, START_HEIGHT);
+		this.addKeyListener(this);
 		this.setVisible(true);
 	}
 	
@@ -137,5 +141,44 @@ public class BattleDisplay extends JFrame {
 		}
 		
 		graphics.drawImage(image, 0, 0, null);
+	}
+
+	public void keyPressed(KeyEvent e) {
+		double moveScale = 100.0;
+		double moveAmount = moveScale / pixPerUnit;
+		double zoomScale = 0.1;
+		switch(e.getKeyCode())
+		{
+		case KeyEvent.VK_DOWN:
+			corner.y += moveAmount;
+			break;
+		case KeyEvent.VK_UP:
+			corner.y -= moveAmount;
+			break;
+		case KeyEvent.VK_RIGHT:
+			corner.x += moveAmount;
+			break;
+		case KeyEvent.VK_LEFT:
+			corner.x -= moveAmount;
+			break;
+		case KeyEvent.VK_W:
+			pixPerUnit *= (1.0 + zoomScale);
+			break;
+		case KeyEvent.VK_S:
+			pixPerUnit *= (1.0 - zoomScale);
+			break;
+		default:
+			break;
+		}
+	}
+
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
