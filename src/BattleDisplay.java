@@ -7,29 +7,26 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 
 public class BattleDisplay extends JFrame {
-	public static final int WIDTH = 1200;
-	public static final int HEIGHT = 800;
+	public static final int START_WIDTH = 1000;
+	public static final int START_HEIGHT = 600;
 	
 	//World units, not pixels
 	public static final int margin = 5;
 	
-	//Area of the battlefield covered by the screen
-	public double minX;
-	public double maxX;
-	public double minY;
-	public double maxY;
+	
+	public Vector2 corner;
+	public double pixPerUnit;
 	
 	ArrayList<Guy> guys;
 	
 	ArrayList<Color> hpColors;
 	ArrayList<Color> shieldColors;
  	
-	public BattleDisplay(ArrayList<Guy> guys, int minX, int minY, int maxX, int maxY)
+	public BattleDisplay(ArrayList<Guy> guys)
 	{
-		this.minX = minX;
-		this.minY = minY;
-		this.maxX = maxX;
-		this.maxY = maxY;
+		corner = new Vector2(0, 0);
+		pixPerUnit = 10;
+		
 		this.guys = guys;
 		
 		//Precompute colors for all hp values
@@ -53,7 +50,7 @@ public class BattleDisplay extends JFrame {
 		});
 		
 		this.setTitle("Shield Wall");
-		this.setSize(WIDTH, HEIGHT);
+		this.setSize(START_WIDTH, START_HEIGHT);
 		this.setVisible(true);
 	}
 	
@@ -61,29 +58,29 @@ public class BattleDisplay extends JFrame {
 	//TODO could precompute some of this stuff
 	int sx(double worldX)
 	{
-		return (int)((worldX - minX) * WIDTH / (maxX - minX));
+		return (int)((worldX - corner.x) * pixPerUnit);
 	}
 	int sy(double worldY)
 	{
-		return (int)((worldY - minY) * HEIGHT / (maxY - minY));
+		return (int)((worldY - corner.y) * pixPerUnit);
 	}
 	int ss(double worldScalar)
 	{
-		return (int)(worldScalar * WIDTH / (maxX - minX));
+		return (int)(worldScalar * pixPerUnit);
 	}
 	
 	public boolean inbounds(Vector2 v)
 	{
-		return (v.x >= (minX - margin))
-			 &&(v.y >= (minY - margin))
-			 &&(v.x <= (maxX + margin))
-			 &&(v.y <= (maxY + margin));  
+		return (v.x >= (corner.x - margin))
+			 &&(v.y >= (corner.y - margin))
+			 &&(v.x <= (corner.x + (getWidth()/pixPerUnit) + margin))
+			 &&(v.y <= (corner.y + (getHeight()/pixPerUnit) + margin));  
 	}
 	public void paint(Graphics graphics){
-		Image image = createImage(WIDTH, HEIGHT);
+		Image image = createImage(getWidth(), getHeight());
 		Graphics g = image.getGraphics();
 		g.setColor(Color.black);
-		g.fillRect(0, 0, WIDTH, HEIGHT);
+		g.fillRect(0, 0, getWidth(), getHeight());
 		
 		for(Guy guy: guys) {
 			if(inbounds(guy.p))
@@ -127,7 +124,7 @@ public class BattleDisplay extends JFrame {
 				//Shield
 				g.setColor(shieldColors.get(guy.stam));				
 				//This is the hypotenuse of a triangle where the other sides are the radius and half the shield
-				double lenToShield = Guy.radius / Math.sin(Guy.halfShieldRad);
+				double lenToShield = Guy.radius / Math.cos(Guy.halfShieldRad);
 				//dunno if this left/right is correct but doesn't really matter
 				Vector2 shieldRight = new Vector2(guy.p).addPolar(lenToShield, guy.bearingRad + Guy.halfShieldRad);
 				Vector2 shieldLeft = new Vector2(guy.p).addPolar(lenToShield, guy.bearingRad - Guy.halfShieldRad);

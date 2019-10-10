@@ -11,7 +11,7 @@ public class Main {
 	public static void main(String[] args) {
 		ArrayList<Guy> list = new ArrayList<Guy>();
 		
-		BattleDisplay display = new BattleDisplay(list, 0, 0, 120, 80);
+		BattleDisplay display = new BattleDisplay(list);
 		
 		Random rand = new Random();
 		
@@ -57,6 +57,10 @@ public class Main {
 						}
 					}
 				}
+				if(guy.strafeTimer > 0)
+				{
+					guy.strafeTimer --;
+				}
 				
 				if(guy.hp > 0)
 				{
@@ -94,6 +98,8 @@ public class Main {
 					else
 					{
 						guy.v.mul(-1.0);
+						guy.strafeTimer = Guy.maxStrafeTimer;
+						guy.strafeRad = rand.nextBoolean() ? Guy.strafeMagnitude : - guy.strafeMagnitude;
 					}
 				}
 				else if(guy.hp<=0 && guy.deathTimer == 0)

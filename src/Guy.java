@@ -32,8 +32,12 @@ public class Guy {
 	public static final int maxDeathTimer = 50;
 	public int stamRegenTimer;
 	public static final int maxStamRegenTimer = 50;
+	public double strafeRad;
+	public int strafeTimer;
+	public static final int maxStrafeTimer = 10;
+	public static final double strafeMagnitude = Math.PI/8;
 	
-	public static final double halfShieldRad = Math.PI/4;
+	public static final double halfShieldRad = Math.PI/3;
 	
 	public Guy(double x, double y, int initiative, int rgb){
 		this.p = new Vector2(x, y);
@@ -49,7 +53,11 @@ public class Guy {
 	
 	//Note: this alters the argument
 	public void updateVelocity(Vector2 desired)
-	{	
+	{
+		if(strafeTimer > 0)
+		{
+			desired.rotate(strafeRad);
+		}
 		//Interpret a zero vector as a request to slow to a stop
 		if(desired.x == 0 && desired.y == 0)
 		{

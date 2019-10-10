@@ -85,6 +85,33 @@ public class Vector2 {
 		return this;
 	}
 	
+	public Vector2 toPolar()
+	{
+		double r = magnitude();
+		double theta = Math.atan2(y, x);
+		x = r;
+		y = theta;
+		return this;
+	}
+	
+	public Vector2 toCartesian()
+	{
+		double xx = Math.cos(y) * x;
+		double yy = Math.sin(y) * x;
+		x = xx;
+		y = yy;
+		return this;
+	}
+	
+	public Vector2 rotate(double angle)
+	{
+		//TODO optimize?
+		toPolar();
+		y += angle;
+		toCartesian();
+		return this;
+	}
+	
 	private void checkNaN()
 	{
 		if(Double.isNaN(x) || Double.isNaN(x))
