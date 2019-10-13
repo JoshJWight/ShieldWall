@@ -1,6 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
-
 import java.awt.Color;
 
 
@@ -28,7 +28,11 @@ public class Main {
 			int initiative = rand.nextInt(attackCycle);
 			Guy guy = new Guy(rand.nextInt(prepWidth), rand.nextInt(prepHeight) + ((i%2)*(prepHeight + noMansLand)), initiative, rgb);
 			list.add(guy);
+			
+			guy.rgb = randomizeColor(guy.rgb);
 		}
+		
+		ArrayList<Group> groups = makeGroups(list);
 		
 		int timer = 0;
 		
@@ -76,11 +80,11 @@ public class Main {
 					//Preferably in sqrt(n) or log(n) or constant time
 					for(Guy other: list)
 					{
-						if(other.rgb == guy.rgb && other != guy)
+						if(other.factionRgb == guy.factionRgb && other != guy)
 						{
 							allies.add(other);
 						}
-						else if(other.rgb != guy.rgb)
+						else if(other.factionRgb != guy.factionRgb)
 						{
 							enemies.add(other);
 						}
@@ -247,5 +251,71 @@ public class Main {
 			}
 		}
 	}
-
+	
+	public static int randomizeColor(int rgb)
+	{
+		Color c = new Color(rgb);
+		
+		int r = randomizeColorSegment(c.getRed());
+		int g = randomizeColorSegment(c.getGreen());
+		int b = randomizeColorSegment(c.getBlue());
+		
+		return new Color(r, g, b).getRGB();
+	}
+	
+	public static int randomizeColorSegment(int color)
+	{
+		//Todo replace with class member
+		Random rand = new Random();
+		double maxAdjust = 0.4;
+		int maxColor = 255;
+		
+		double adjust = rand.nextDouble() * maxAdjust;
+		
+		//Increase
+		if(rand.nextBoolean())
+		{
+			color = (int)(color + (maxColor * adjust));
+			color = Math.min(color, maxColor);
+		}
+		//Decrease
+		else
+		{
+			color = (int)(color - (maxColor * adjust));
+			color = Math.max(color, 0);
+		}
+		
+		return color;
+	}
+	
+	public static ArrayList<Group> makeGroups(ArrayList<Guy> guys)
+	{
+		ArrayList<Group> groups = new ArrayList<Group>();
+		HashMap<Guy, Group> guyToGroup = new HashMap<Guy, Group>();
+		for(Guy founder: guys)
+		{
+			if(!guyToGroup.containsKey(founder))
+			{
+				ArrayList<Guy> members = new ArrayList<Guy>();
+				//TODO add magic algorithm
+				for(Guy guy: guys)
+				{
+					//This will also get the founder
+					if(!guyToGroup.containsKey(guy)&&
+					    guy.factionRgb == founder.factionRgb &&
+					    guy.dist(founder) < Group.formationRadius)
+					{
+						members.add(guy);
+					}
+				}
+				Group group = new Group(members, randomizeColor(founder.rgb));
+				groups.add(group);
+				for(Guy guy: members)
+				{
+					guyToGroup.put(guy, group);
+				}
+			}
+		}
+		return groups;
+	}
 }

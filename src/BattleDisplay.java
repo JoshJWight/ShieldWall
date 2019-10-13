@@ -128,10 +128,10 @@ public class BattleDisplay extends JFrame implements KeyListener {
 				//Shield
 				g.setColor(shieldColors.get(guy.stam));				
 				//This is the hypotenuse of a triangle where the other sides are the radius and half the shield
-				double lenToShield = Guy.radius / Math.cos(Guy.halfShieldRad);
+				double lenToShield = Guy.radius / Math.cos(Guy.halfShieldRad/1.5);
 				//dunno if this left/right is correct but doesn't really matter
-				Vector2 shieldRight = new Vector2(guy.p).addPolar(lenToShield, guy.bearingRad + Guy.halfShieldRad);
-				Vector2 shieldLeft = new Vector2(guy.p).addPolar(lenToShield, guy.bearingRad - Guy.halfShieldRad);
+				Vector2 shieldRight = new Vector2(guy.p).addPolar(lenToShield, guy.bearingRad + Guy.halfShieldRad/1.5);
+				Vector2 shieldLeft = new Vector2(guy.p).addPolar(lenToShield, guy.bearingRad - Guy.halfShieldRad/1.5);
 				g.drawLine(
 						sx(shieldRight.x),
 						sy(shieldRight.y),

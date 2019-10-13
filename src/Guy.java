@@ -24,6 +24,7 @@ public class Guy {
 	public static final double attackReach = 2.5;
 	
 	public int rgb;
+	public int factionRgb;
 	
 	public int initiative;
 	public int attackTimer;
@@ -43,6 +44,7 @@ public class Guy {
 		this.p = new Vector2(x, y);
 		this.v = Vector2.zero();
 		this.rgb = rgb;
+		this.factionRgb = rgb;
 		
 		hp = maxHp;
 		
