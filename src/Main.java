@@ -12,7 +12,6 @@ public class Main {
 	public static void main(String[] args) {
 		ArrayList<Guy> list = new ArrayList<Guy>();
 		
-		BattleDisplay display = new BattleDisplay(list);
 		AI ai = new AI();
 		
 		Random rand = new Random();
@@ -20,7 +19,7 @@ public class Main {
 		int nGuys = 200;
 		
 		int prepHeight = 50;
-		int prepWidth = 100;
+		int prepWidth = 150;
 		int noMansLand = 60;
 		
 		for(int i=0; i<nGuys; i++)
@@ -36,6 +35,8 @@ public class Main {
 		ArrayList<Group> groups = makeGroups(list);
 		
 		int timer = 0;
+		
+		BattleDisplay display = new BattleDisplay(list, groups);
 		
 		while(true)
 		{

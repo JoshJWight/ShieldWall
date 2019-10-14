@@ -81,7 +81,8 @@ public class AI {
 			obj.velocity.add(diff.mul(1.0/(mag * mag)));
 		}
 		//face back to the enemies while retreating
-		obj.bearing = Math.atan2(obj.velocity.y, obj.velocity.x);
+		Guy closestEnemy = closestGuy(guy, enemies);
+		obj.bearing = new Vector2(closestEnemy.p).sub(guy.p).angle();
 		obj.velocity.mul(-1.0);
 		return obj;
 	}
@@ -137,10 +138,22 @@ public class AI {
 		//TODO Have guys respect personal space?
 		Objective objective;
 		
+		double safeDist = 5;
+		double distToEnemy = safeDist+1;
+		if(enemies.size() > 0)
+		{
+			Guy closestEnemy = closestGuy(guy, enemies);
+			distToEnemy = guy.dist(closestEnemy);
+		}
+		
 		if(guy.group != null)
 		{
 			Group group = guy.group;
-			if(guy.dist(group.center) > group.radius)
+			if(guy.stam <= guy.maxStam / 5 && distToEnemy < safeDist)
+			{
+				objective = flee(guy, enemies);
+			}
+			else if(guy.dist(group.center) > group.radius)
 			{
 				objective = moveToGroup(guy, group);
 			}
@@ -155,14 +168,6 @@ public class AI {
 		}
 		else
 		{
-			double safeDist = 5;
-			double distToEnemy = safeDist+1;
-			if(enemies.size() > 0)
-			{
-				Guy closestEnemy = closestGuy(guy, enemies);
-				distToEnemy = guy.dist(closestEnemy);
-			}
-			
 			if(distToEnemy < safeDist)
 			{
 				objective = flee(guy, enemies);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 public class Group {
 	public static final int minGuys = 5;
 	public static final double formationRadius = 20;
+	public static final double radiusMultiplier = 4.0;
 	
 	public ArrayList<Guy> guys;
 	
@@ -47,7 +48,7 @@ public class Group {
 	
 	private void updateRadii()
 	{
-		radius = Math.sqrt(guys.size()) * 3.0;
+		radius = Math.sqrt(guys.size()) * radiusMultiplier;
 		disengageRadius = radius * 2.0;
 	}
 	

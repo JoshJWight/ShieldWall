@@ -20,16 +20,18 @@ public class BattleDisplay extends JFrame implements KeyListener {
 	public double pixPerUnit;
 	
 	ArrayList<Guy> guys;
+	ArrayList<Group> groups;
 	
 	ArrayList<Color> hpColors;
 	ArrayList<Color> shieldColors;
  	
-	public BattleDisplay(ArrayList<Guy> guys)
+	public BattleDisplay(ArrayList<Guy> guys, ArrayList<Group> groups)
 	{
 		corner = new Vector2(0, 0);
 		pixPerUnit = 10;
 		
 		this.guys = guys;
+		this.groups = groups;
 		
 		//Precompute colors for all hp values
 		hpColors = new ArrayList<Color>();
@@ -138,6 +140,15 @@ public class BattleDisplay extends JFrame implements KeyListener {
 						sx(shieldLeft.x),
 						sy(shieldLeft.y));
 			}
+		}
+		for(Group group: groups)
+		{
+			g.setColor(new Color(group.rgb));
+			g.drawOval(
+					sx(group.center.x - group.radius),
+					sy(group.center.y - group.radius),
+					ss(group.radius * 2),
+					ss(group.radius * 2));
 		}
 		
 		graphics.drawImage(image, 0, 0, null);
