@@ -54,6 +54,11 @@ public class Vector2 {
 		return new Vector2(0, 0);
 	}
 	
+	public static Vector2 unit(double theta)
+	{
+		return new Vector2(1.0, theta).toCartesian();
+	}
+	
 	public Vector2 normalize()
 	{
 		double mag = this.magnitude();
@@ -110,6 +115,11 @@ public class Vector2 {
 		y += angle;
 		toCartesian();
 		return this;
+	}
+	
+	public double angle()
+	{
+		return Math.atan2(y, x);
 	}
 	
 	private void checkNaN()

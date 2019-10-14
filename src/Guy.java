@@ -40,6 +40,8 @@ public class Guy {
 	
 	public static final double halfShieldRad = Math.PI/3;
 	
+	public Group group;
+	
 	public Guy(double x, double y, int initiative, int rgb){
 		this.p = new Vector2(x, y);
 		this.v = Vector2.zero();

@@ -2,23 +2,92 @@ import java.util.ArrayList;
 
 
 public class Group {
+	public static final int minGuys = 5;
 	public static final double formationRadius = 20;
 	
 	public ArrayList<Guy> guys;
 	
 	public int rgb;
+	public int factionRgb;
 	
 	//These values are computed on update
 	Vector2 center;
+	double bearing;
 	double radius;
+	double disengageRadius;
 	
 	public Group(ArrayList<Guy> initialGuys, int rgb)
 	{
-		this.guys = initialGuys;
+		this.guys = new ArrayList<Guy>();
 		this.rgb = rgb;
+		this.factionRgb = initialGuys.get(0).factionRgb;
+		for(Guy guy: initialGuys)
+		{
+			add(guy);
+		}
+		
+		updateCenter();
+		updateRadii();
+	}
+	
+	private void updateCenter()
+	{
+		Vector2 newCenter = Vector2.zero();
 		for(Guy guy: guys)
 		{
-			guy.rgb = rgb;
+			newCenter.add(guy.p);
+		}
+		newCenter.mul(1.0/(double)guys.size());
+		if(center != null)
+		{
+			bearing = new Vector2(newCenter).sub(center).angle();
+		}
+		center = newCenter;
+	}
+	
+	private void updateRadii()
+	{
+		radius = Math.sqrt(guys.size()) * 3.0;
+		disengageRadius = radius * 2.0;
+	}
+	
+	
+	public void update()
+	{
+		//Note: these calculated values include the guys we're about to remove.
+		//But that shouldn't matter in the long run
+		updateCenter();
+		updateRadii();
+		for(int i=0; i<guys.size(); i++)
+		{
+			Guy guy = guys.get(i);
+			if(guy.hp <= 0 || guy.dist(center) > disengageRadius)
+			{
+				remove(guy);
+				i--;
+			}
+		}
+	}
+	
+	public void add(Guy guy)
+	{
+		guys.add(guy);
+		guy.rgb = rgb;
+		guy.group = this;
+	}
+	
+	public void remove(Guy guy)
+	{
+		guys.remove(guy);
+		guy.rgb = guy.factionRgb;
+		guy.group = null;
+	}
+	
+	public void removeAll()
+	{
+		while(guys.size() > 0)
+		{
+			remove(guys.get(guys.size() - 1));
 		}
 	}
 }
