@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 
 public class Group {
-	public static final int minGuys = 5;
+	public static final int minGuys = 10;
 	public static final double formationRadius = 20;
 	public static final double radiusMultiplier = 4.0;
 	

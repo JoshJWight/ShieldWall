@@ -1,7 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -61,7 +60,6 @@ public class BattleDisplay extends JFrame implements KeyListener {
 	}
 	
 	//Convert to screen coords. Wanted short names since we'll use these a lot
-	//TODO could precompute some of this stuff
 	int sx(double worldX)
 	{
 		return (int)((worldX - corner.x) * pixPerUnit);
@@ -117,7 +115,7 @@ public class BattleDisplay extends JFrame implements KeyListener {
 				double lineTip = Guy.radius * 7.0/6.0;
 				if(guy.attackTimer > 0)
 				{
-					lineTip = guy.attackReach;
+					lineTip = Guy.attackReach;
 				}
 				Vector2 wepIn = new Vector2(guy.p).addPolar(Guy.radius * 5.0/6.0, guy.bearingRad);
 				Vector2 wepOut = new Vector2(guy.p).addPolar(Guy.radius * lineTip, guy.bearingRad);
@@ -184,12 +182,10 @@ public class BattleDisplay extends JFrame implements KeyListener {
 	}
 
 	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		//NOTHING
 	}
 
 	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		//NOTHING
 	}
 }

@@ -104,6 +104,7 @@ public class AI {
 		return new Objective(Vector2.unit(guy.group.bearing));
 	}
 	
+	//TODO move the side effects on stamina and HP out of AI
 	private void doAttack(Guy guy, ArrayList<Guy> enemies)
 	{
 		Vector2 targetPoint = new Vector2(guy.p).addPolar(Guy.attackReach, guy.bearingRad);
