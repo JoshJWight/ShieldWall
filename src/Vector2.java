@@ -131,4 +131,9 @@ public class Vector2 {
 			System.exit(0);
 		}
 	}
+	
+	public double dist(Vector2 other)
+	{
+		return new Vector2(this).sub(other).magnitude();
+	}
 }

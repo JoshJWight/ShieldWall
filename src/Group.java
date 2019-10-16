@@ -11,6 +11,8 @@ public class Group {
 	public int rgb;
 	public int factionRgb;
 	
+	public Vector2 target;
+	
 	//These values are computed on update
 	Vector2 center;
 	double bearing;

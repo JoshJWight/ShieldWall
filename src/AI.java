@@ -101,7 +101,7 @@ public class AI {
 	private Objective followGroup(Guy guy)
 	{
 		//TODO this might be where we put repositioning within the group
-		return new Objective(Vector2.unit(guy.group.bearing));
+		return new Objective(new Vector2(guy.group.target).sub(guy.p));
 	}
 	
 	//TODO move the side effects on stamina and HP out of AI
@@ -193,6 +193,27 @@ public class AI {
 		if(timer == guy.initiative && !enemies.isEmpty())
 		{
 			doAttack(guy, enemies);
+		}
+	}
+	
+	public void groupAI(Group group, ArrayList<Group> groups)
+	{
+		Group closestEnemy = null;
+		for(Group other: groups)
+		{
+			if(other.factionRgb != group.factionRgb &&
+			  (closestEnemy == null || group.center.dist(other.center) < group.center.dist(closestEnemy.center)))
+			{
+				closestEnemy = other;
+			}
+		}
+		
+		if(closestEnemy == null)
+		{
+			group.target = new Vector2(group.center);
+		}
+		else{
+			group.target = new Vector2(closestEnemy.center);
 		}
 	}
 }

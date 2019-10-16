@@ -1,3 +1,5 @@
+import java.util.Comparator;
+
 
 public class Guy {
 	
@@ -41,6 +43,9 @@ public class Guy {
 	public static final double halfShieldRad = Math.PI/3;
 	
 	public Group group;
+	
+	public int xIndex;
+	public int yIndex;
 	
 	public Guy(double x, double y, int initiative, int rgb){
 		this.p = new Vector2(x, y);
@@ -114,12 +119,12 @@ public class Guy {
 	
 	public double dist(Guy other)
 	{
-		return new Vector2(p).sub(other.p).magnitude();
+		return p.dist(other.p);
 	}
 	
 	public double dist(Vector2 pos)
 	{
-		return new Vector2(p).sub(pos).magnitude();
+		return p.dist(pos);
 	}
 	
 	public boolean shieldedFrom(Vector2 pos)
@@ -133,4 +138,22 @@ public class Guy {
 		return (diff < halfShieldRad) && (diff > -halfShieldRad);
 	}
 	
+	public static class XSort implements Comparator<Guy>
+	{
+		public int compare(Guy a, Guy b) {
+			return (a.p.x == b.p.x ? 0:
+				   (a.p.x < b.p.x ? -1: 1));
+				
+		}
+		
+	}
+	public static class YSort implements Comparator<Guy>
+	{
+		public int compare(Guy a, Guy b) {
+			return (a.p.y == b.p.y ? 0:
+				   (a.p.y < b.p.y ? -1: 1));
+				
+		}
+		
+	}
 }
