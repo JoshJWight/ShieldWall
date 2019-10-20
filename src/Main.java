@@ -1,9 +1,9 @@
 public class Main {
 	
-	static final int frameTimeMs = 5;
+	static final int frameTimeMs = 20;
 	//TODO move most of this stuff out of Main
 	public static void main(String[] args) {
-		int nGuys = 10000;
+		int nGuys = 2000;
 		BattleModel model = new BattleModel(nGuys);
 		BattleDisplay display = new BattleDisplay(model.guys, model.groups);
 		

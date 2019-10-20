@@ -36,9 +36,9 @@ public class BattleModel {
 		
 		rand = new Random();
 		
-		//int prepHeight = 50;
-		//int prepWidth = 150;
-		//int noMansLand = 60;
+		int prepHeight = (int)(Math.sqrt(nGuys) * 5);
+		int prepWidth = (int)Math.sqrt(nGuys) * 10;
+		int noMansLand = 60;
 		
 		int width = (int)(Math.sqrt(nGuys) * 5);
 		
@@ -46,8 +46,7 @@ public class BattleModel {
 		{
 			int rgb = (i%2==0) ? Color.RED.getRGB() : Color.BLUE.getRGB();
 			int initiative = rand.nextInt(attackCycle);
-			//Guy guy = new Guy(rand.nextInt(prepWidth), rand.nextInt(prepHeight) + ((i%2)*(prepHeight + noMansLand)), initiative, rgb);
-			Guy guy = new Guy(rand.nextInt(width), rand.nextInt(width), initiative, rgb);
+			Guy guy = new Guy(rand.nextInt(prepWidth), rand.nextInt(prepHeight) + ((i%2)*(prepHeight + noMansLand)), initiative, rgb);
 			guys.add(guy);
 			xIndex.add(guy);
 			yIndex.add(guy);
@@ -132,33 +131,46 @@ public class BattleModel {
 		return false;
 	}
 	
-	private void updateGuyTimers(Guy guy)
+	private void updateTimers()
 	{
-		if(guy.attackTimer > 0)
+		for(Guy guy: guys)
 		{
-			guy.attackTimer--;
-		}
-		if(guy.deathTimer > 0)
-		{
-			guy.deathTimer--;
-		}
-		if(guy.stamRegenTimer > 0)
-		{
-			guy.stamRegenTimer--;
-			if(guy.stamRegenTimer ==0)
+			if(guy.attackTimer > 0)
 			{
-				guy.stam++;
-				if(guy.stam < Guy.maxStam)
+				guy.attackTimer--;
+			}
+			if(guy.deathTimer > 0)
+			{
+				guy.deathTimer--;
+			}
+			if(guy.stamRegenTimer > 0)
+			{
+				guy.stamRegenTimer--;
+				if(guy.stamRegenTimer ==0)
 				{
-					guy.stamRegenTimer = Guy.maxStamRegenTimer;
+					guy.stam++;
+					if(guy.stam < Guy.maxStam)
+					{
+						guy.stamRegenTimer = Guy.maxStamRegenTimer;
+					}
 				}
 			}
+			if(guy.strafeTimer > 0)
+			{
+				guy.strafeTimer--;
+			}
 		}
-		if(guy.strafeTimer > 0)
+		for(Group group: groups)
 		{
-			guy.strafeTimer --;
+			if(group.strafeTimer > 0)
+			{
+				group.strafeTimer--;
+			}
+			if(group.idleness > 0)
+			{
+				group.idleness --;
+			}
 		}
-		
 	}
 	
 	private void updateGuyPos(Guy guy)
@@ -189,7 +201,6 @@ public class BattleModel {
 		
 		for(Guy guy: guys)
 		{
-			updateGuyTimers(guy);
 			if(guy.hp<=0 && guy.deathTimer == 0)
 			{
 				vanishing.add(guy);
@@ -236,6 +247,7 @@ public class BattleModel {
 	
 	public void update()
 	{
+		updateTimers();
 		updateMemberships();
 		updateGroups();
 		updateGuys();

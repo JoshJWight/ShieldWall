@@ -92,30 +92,18 @@ public class Guy {
 	
 	void updateBearing(double desired)
 	{
-		double diff = recenterBearing(desired - bearingRad);
+		double diff = Vector2.recenterBearing(desired - bearingRad);
 		double update = Math.min(Math.abs(diff), rotationSpeed);
 		if(diff > 0)
 		{
-			bearingRad = recenterBearing(bearingRad + update);
+			bearingRad = Vector2.recenterBearing(bearingRad + update);
 		}
 		else
 		{
-			bearingRad = recenterBearing(bearingRad - update);
+			bearingRad = Vector2.recenterBearing(bearingRad - update);
 		}
 	}
 	
-	private double recenterBearing(double bearing)
-	{
-		while(bearing > Math.PI)
-		{
-			bearing -= 2.0 * Math.PI;
-		}
-		while(bearing < - Math.PI)
-		{
-			bearing += 2.0 * Math.PI;
-		}
-		return bearing;
-	}
 	
 	public double dist(Guy other)
 	{
@@ -134,7 +122,7 @@ public class Guy {
 			return false;
 		}
 		double posBearing = Math.atan2(pos.y - p.y, pos.x - p.x);
-		double diff = recenterBearing(bearingRad - posBearing);
+		double diff = Vector2.recenterBearing(bearingRad - posBearing);
 		return (diff < halfShieldRad) && (diff > -halfShieldRad);
 	}
 	

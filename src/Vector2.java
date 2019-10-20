@@ -9,21 +9,28 @@ public class Vector2 {
 	{
 		this.x = x;
 		this.y = y;
-		checkNaN();
+		//checkNaN();
 	}
 	
 	public Vector2(Vector2 other)
 	{
 		this.x = other.x;
 		this.y = other.y;
-		checkNaN();
+		//checkNaN();
+	}
+	
+	public Vector2 set(double x, double y)
+	{
+		this.x = x;
+		this.y = y;
+		return this;
 	}
 	
 	public Vector2 add(Vector2 other)
 	{
 		this.x += other.x;
 		this.y += other.y;
-		checkNaN();
+		//checkNaN();
 		return this;
 	}
 	
@@ -31,7 +38,7 @@ public class Vector2 {
 	{
 		this.x -= other.x;
 		this.y -= other.y;
-		checkNaN();
+		//checkNaN();
 		return this;
 	}
 	
@@ -39,13 +46,13 @@ public class Vector2 {
 	{
 		this.x *= val;
 		this.y *= val;
-		checkNaN();
+		//checkNaN();
 		return this;
 	}
 	
 	double magnitude()
 	{
-		checkNaN();
+		//checkNaN();
 		return Math.sqrt((x * x) + (y * y));
 	}
 	
@@ -71,7 +78,7 @@ public class Vector2 {
 		{
 			mul(1.0 / mag);
 		}
-		checkNaN();
+		//checkNaN();
 		return this;
 	}
 	
@@ -79,14 +86,14 @@ public class Vector2 {
 	{
 		x += Math.cos(theta) * r;
 		y += Math.sin(theta) * r;
-		checkNaN();
+		//checkNaN();
 		return this;
 	}
 	//Notation here is that polar coords are (r, theta)
 	public Vector2 addPolar(Vector2 polar)
 	{
 		addPolar(polar.x, polar.y);
-		checkNaN();
+		//checkNaN();
 		return this;
 	}
 	
@@ -135,5 +142,25 @@ public class Vector2 {
 	public double dist(Vector2 other)
 	{
 		return new Vector2(this).sub(other).magnitude();
+	}
+	
+	public double bearingTo(Vector2 other)
+	{
+		return new Vector2(other).sub(this).angle();
+	}
+	
+	
+	//TODO this doesn't have much to do with Vector2. Move to separate generic math class?
+	public static double recenterBearing(double bearing)
+	{
+		while(bearing > Math.PI)
+		{
+			bearing -= 2.0 * Math.PI;
+		}
+		while(bearing < - Math.PI)
+		{
+			bearing += 2.0 * Math.PI;
+		}
+		return bearing;
 	}
 }

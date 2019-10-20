@@ -11,11 +11,20 @@ public class Group {
 	public int rgb;
 	public int factionRgb;
 	
+	//AI
 	public Vector2 target;
+	public int strafeTimer;
+	public double strafeBearing;
+	
+	public int idleness;
+	public static final int idleThreshold = 500;
+	boolean isReserves;
+	
+	public static final int maxStrafeTimer = 40;
+	
 	
 	//These values are computed on update
 	Vector2 center;
-	double bearing;
 	double radius;
 	double disengageRadius;
 	
@@ -41,10 +50,6 @@ public class Group {
 			newCenter.add(guy.p);
 		}
 		newCenter.mul(1.0/(double)guys.size());
-		if(center != null)
-		{
-			bearing = new Vector2(newCenter).sub(center).angle();
-		}
 		center = newCenter;
 	}
 	

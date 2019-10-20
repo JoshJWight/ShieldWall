@@ -160,7 +160,15 @@ public class AI {
 			}
 			else if(!enemies.isEmpty())
 			{
-				objective = attackClosest(guy, enemies);
+				Guy closestEnemy = closestGuy(guy, enemies);
+				if(guy.dist(closestEnemy) > 5 && closestEnemy.dist(guy.group.center) > guy.group.radius)
+				{
+					objective = followGroup(guy);
+				}
+				else
+				{
+					objective = attackClosest(guy, enemies);
+				}
 			}
 			else
 			{
@@ -198,6 +206,19 @@ public class AI {
 	
 	public void groupAI(Group group, ArrayList<Group> groups)
 	{
+		if(group.isReserves)
+		{
+			//TODO
+			group.target = new Vector2(group.center);
+			return;
+		}
+		
+		if(group.strafeTimer > 0)
+		{
+			group.target = new Vector2(group.center).add(Vector2.unit(group.strafeBearing).mul(group.disengageRadius));
+			return;
+		}
+		
 		Group closestEnemy = null;
 		for(Group other: groups)
 		{
@@ -212,8 +233,48 @@ public class AI {
 		{
 			group.target = new Vector2(group.center);
 		}
-		else{
+		else
+		{
 			group.target = new Vector2(closestEnemy.center);
+			
+			final double maxAngle = Math.PI/8.0;
+			final double strafeAmount = Math.PI/2;
+			for(Group other: groups)
+			{
+				if(other!=group && other!=closestEnemy &&
+				   group.center.dist(other.center) < group.center.dist(closestEnemy.center)&&
+				   group.center.dist(other.center) < group.radius + other.radius &&
+				   other.radius > group.radius/2.0) 
+				{
+					double enemyBearing = group.center.bearingTo(closestEnemy.center);
+					double bearingDiff = Vector2.recenterBearing(
+							group.center.bearingTo(other.center) - enemyBearing);
+					if(Math.abs(bearingDiff) < maxAngle)
+					{
+						group.strafeTimer = Group.maxStrafeTimer;
+						
+						//if other is to the +bearing side of closestEnemy, turn to -bearing, and vice versa
+						if(bearingDiff > 0)
+						{
+							group.strafeBearing = Vector2.recenterBearing(enemyBearing - strafeAmount);
+						}
+						else
+						{
+							group.strafeBearing = Vector2.recenterBearing(enemyBearing + strafeAmount);
+						}
+						
+						//If the group is spending too much time strafing, make it do reserve duty
+						//TODO distinguish between strafing that actually covers difference and strafing that just goes back and forth
+						group.idleness += Group.maxStrafeTimer * 2;
+						if(group.idleness > Group.idleThreshold)
+						{
+							group.isReserves = true;
+						}
+						
+						break;
+					}
+				}
+			}
 		}
 	}
 }
