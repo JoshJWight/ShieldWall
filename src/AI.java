@@ -204,13 +204,59 @@ public class AI {
 		}
 	}
 	
+	private boolean groupIsOutnumbered(Group group, ArrayList<Group> groups)
+	{
+		final double enemyToAllyThreshold = 2;
+		int allyTotal = 0;
+		int enemyTotal = 0;
+		//This will hit the group itself
+		for(Group other: groups)
+		{
+			if(group.center.dist(other.center) < Group.distressSearchRadius)
+			{
+				if(other.factionRgb == group.factionRgb)
+				{
+					allyTotal += other.guys.size();
+				}
+				else
+				{
+					enemyTotal += other.guys.size();
+				}
+			}
+		}
+		
+		return (double)enemyTotal / (double)allyTotal > enemyToAllyThreshold;
+	}
+	
 	public void groupAI(Group group, ArrayList<Group> groups)
 	{
 		if(group.isReserves)
 		{
-			//TODO
-			group.target = new Vector2(group.center);
+			group.isDistressed = false;
+			
+			Group nearestDistressedAlly = null;
+			for(Group other: groups)
+			{
+				if(other.isDistressed && other.factionRgb == group.factionRgb &&
+					(nearestDistressedAlly == null ||
+					group.center.dist(other.center) < group.center.dist(nearestDistressedAlly.center)))
+				{
+					nearestDistressedAlly = other;
+				}
+			}
+			if(nearestDistressedAlly != null)
+			{
+				group.target = nearestDistressedAlly.center;
+			}
+			else
+			{
+				group.target = new Vector2(group.center);
+			}
 			return;
+		}
+		else
+		{
+			group.isDistressed = groupIsOutnumbered(group, groups);
 		}
 		
 		if(group.strafeTimer > 0)

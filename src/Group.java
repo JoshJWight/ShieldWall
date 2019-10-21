@@ -15,13 +15,18 @@ public class Group {
 	public Vector2 target;
 	public int strafeTimer;
 	public double strafeBearing;
+	public static final int maxStrafeTimer = 40;
 	
 	public int idleness;
 	public static final int idleThreshold = 500;
-	boolean isReserves;
+	public boolean isReserves;
+	public boolean isDistressed;
 	
-	public static final int maxStrafeTimer = 40;
+	public static final double distressSearchRadius = 20;
 	
+	//Display
+	public int flashTimer;
+	public static final int maxFlashTimer = 20;
 	
 	//These values are computed on update
 	Vector2 center;

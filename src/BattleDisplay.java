@@ -141,7 +141,26 @@ public class BattleDisplay extends JFrame implements KeyListener {
 		}
 		for(Group group: groups)
 		{
-			g.setColor(new Color(group.rgb));
+			if(group.flashTimer >  Group.maxFlashTimer * 2/3)
+			{
+				if(group.isDistressed)
+				{
+					g.setColor(Color.WHITE);
+				}
+				else if(group.isReserves)
+				{
+					g.setColor(Color.GREEN);
+				}
+				else
+				{
+					//Group state has changed while the flash timer was active
+					g.setColor(new Color(group.rgb));
+				}
+			}
+			else
+			{
+				g.setColor(new Color(group.rgb));
+			}
 			g.drawOval(
 					sx(group.center.x - group.radius),
 					sy(group.center.y - group.radius),

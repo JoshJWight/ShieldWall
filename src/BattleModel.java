@@ -110,7 +110,24 @@ public class BattleModel {
 			Group group = groups.get(i);
 			group.update();
 			ai.groupAI(group, groups);
-			if(group.guys.size() < Group.minGuys)
+			
+			//Groups that are too small cease to exist
+			boolean remove = (group.guys.size() < Group.minGuys);
+			
+			//Reserves will pop themselves to join distressed groups
+			if(group.isReserves)
+			{
+				for(Group other: groups)
+				{
+					if(other.isDistressed && other.factionRgb == group.factionRgb && 
+						group.center.dist(other.center) < Group.distressSearchRadius)
+					{
+						remove = true;
+					}
+				}
+			}
+			
+			if(remove)
 			{
 				groups.remove(group);
 				group.removeAll();
@@ -169,6 +186,15 @@ public class BattleModel {
 			if(group.idleness > 0)
 			{
 				group.idleness --;
+			}
+			
+			if(group.flashTimer > 0)
+			{
+				group.flashTimer --;
+			}
+			else if(group.isDistressed || group.isReserves)
+			{
+				group.flashTimer = Group.maxFlashTimer;
 			}
 		}
 	}
