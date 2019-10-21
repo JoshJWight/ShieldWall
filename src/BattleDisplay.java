@@ -15,7 +15,7 @@ public class BattleDisplay extends JFrame implements KeyListener {
 	public static final int margin = 5;
 	
 	
-	public Vector2 corner;
+	public Vector2 center;
 	public double pixPerUnit;
 	
 	ArrayList<Guy> guys;
@@ -26,7 +26,7 @@ public class BattleDisplay extends JFrame implements KeyListener {
  	
 	public BattleDisplay(ArrayList<Guy> guys, ArrayList<Group> groups)
 	{
-		corner = new Vector2(0, 0);
+		center = new Vector2(50, 50);
 		pixPerUnit = 10;
 		
 		this.guys = guys;
@@ -62,11 +62,11 @@ public class BattleDisplay extends JFrame implements KeyListener {
 	//Convert to screen coords. Wanted short names since we'll use these a lot
 	int sx(double worldX)
 	{
-		return (int)((worldX - corner.x) * pixPerUnit);
+		return (int)((worldX - (center.x - (getWidth()/2 /pixPerUnit))) * pixPerUnit);
 	}
 	int sy(double worldY)
 	{
-		return (int)((worldY - corner.y) * pixPerUnit);
+		return (int)((worldY - (center.y - (getHeight()/2 /pixPerUnit))) * pixPerUnit);
 	}
 	int ss(double worldScalar)
 	{
@@ -75,10 +75,10 @@ public class BattleDisplay extends JFrame implements KeyListener {
 	
 	public boolean inbounds(Vector2 v)
 	{
-		return (v.x >= (corner.x - margin))
-			 &&(v.y >= (corner.y - margin))
-			 &&(v.x <= (corner.x + (getWidth()/pixPerUnit) + margin))
-			 &&(v.y <= (corner.y + (getHeight()/pixPerUnit) + margin));  
+		return (v.x >= (center.x - (getWidth() / 2 / pixPerUnit) - margin))
+			 &&(v.y >= (center.y - (getHeight() / 2 / pixPerUnit) - margin))
+			 &&(v.x <= (center.x + (getWidth() / 2 / pixPerUnit) + margin))
+			 &&(v.y <= (center.y + (getHeight() / 2 / pixPerUnit) + margin));  
 	}
 	public void paint(Graphics graphics){
 		Image image = createImage(getWidth(), getHeight());
@@ -159,16 +159,16 @@ public class BattleDisplay extends JFrame implements KeyListener {
 		switch(e.getKeyCode())
 		{
 		case KeyEvent.VK_DOWN:
-			corner.y += moveAmount;
+			center.y += moveAmount;
 			break;
 		case KeyEvent.VK_UP:
-			corner.y -= moveAmount;
+			center.y -= moveAmount;
 			break;
 		case KeyEvent.VK_RIGHT:
-			corner.x += moveAmount;
+			center.x += moveAmount;
 			break;
 		case KeyEvent.VK_LEFT:
-			corner.x -= moveAmount;
+			center.x -= moveAmount;
 			break;
 		case KeyEvent.VK_W:
 			pixPerUnit *= (1.0 + zoomScale);
