@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 
 public class AI {
@@ -37,6 +39,20 @@ public class AI {
 		{
 			if(other != guy &&
 			  (closest == null || guy.dist(other) < guy.dist(closest)))
+			{
+				closest = other;
+			}
+		}
+		return closest;
+	}
+	
+	private Group closestGroup(Group group, ArrayList<Group> groups, BiPredicate<Group, Group> predicate)
+	{
+		Group closest = null;
+		for(Group other: groups)
+		{
+			if(other != group && predicate.test(group, other) &&
+			  (closest == null || group.center.dist(other.center) < group.center.dist(closest.center)))
 			{
 				closest = other;
 			}
@@ -107,6 +123,13 @@ public class AI {
 	//TODO move the side effects on stamina and HP out of AI
 	private void doAttack(Guy guy, ArrayList<Guy> enemies)
 	{
+		//TODO feels awkward to have this logic here
+		if(guy.group != null && guy.group.isReserves)
+		{
+			guy.group.isReserves = false;
+			guy.group.idleness = 0;
+		}
+		
 		Vector2 targetPoint = new Vector2(guy.p).addPolar(Guy.attackReach, guy.bearingRad);
 		for(Guy enemy: enemies)
 		{
@@ -150,7 +173,7 @@ public class AI {
 		if(guy.group != null)
 		{
 			Group group = guy.group;
-			if(guy.stam <= guy.maxStam / 5 && distToEnemy < safeDist)
+			if(guy.stam <= Guy.maxStam / 5 && distToEnemy < safeDist)
 			{
 				objective = flee(guy, enemies);
 			}
@@ -234,23 +257,30 @@ public class AI {
 		{
 			group.isDistressed = false;
 			
-			Group nearestDistressedAlly = null;
-			for(Group other: groups)
-			{
-				if(other.isDistressed && other.factionRgb == group.factionRgb &&
-					(nearestDistressedAlly == null ||
-					group.center.dist(other.center) < group.center.dist(nearestDistressedAlly.center)))
-				{
-					nearestDistressedAlly = other;
-				}
-			}
+			Group nearestDistressedAlly = closestGroup(group, groups, 
+					(Group me, Group other)->(other.isDistressed && other.factionRgb == me.factionRgb));
 			if(nearestDistressedAlly != null)
 			{
 				group.target = nearestDistressedAlly.center;
 			}
 			else
 			{
-				group.target = new Vector2(group.center);
+				Group nearestAlly = closestGroup(group, groups,
+					(Group me, Group other)->(other.factionRgb == me.factionRgb));
+				if(nearestAlly != null && group.center.dist(nearestAlly.center) < group.radius + nearestAlly.radius)
+				{
+					Vector2 diff = new Vector2(nearestAlly.center).sub(group.center);
+					if(!diff.equals(Vector2.zero()))
+					{
+						//Head in the opposite direction of diff
+						double targetBearing = Vector2.recenterBearing(diff.angle() + Math.PI);
+						group.target = new Vector2(group.center).addPolar(group.disengageRadius, targetBearing);
+					}
+				}
+				else
+				{
+					group.target = new Vector2(group.center);
+				}
 			}
 			return;
 		}
@@ -265,15 +295,8 @@ public class AI {
 			return;
 		}
 		
-		Group closestEnemy = null;
-		for(Group other: groups)
-		{
-			if(other.factionRgb != group.factionRgb &&
-			  (closestEnemy == null || group.center.dist(other.center) < group.center.dist(closestEnemy.center)))
-			{
-				closestEnemy = other;
-			}
-		}
+		Group closestEnemy = closestGroup(group, groups,
+				(Group me, Group other)->(other.factionRgb != me.factionRgb));
 		
 		if(closestEnemy == null)
 		{

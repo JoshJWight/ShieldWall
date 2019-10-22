@@ -19,6 +19,11 @@ public class Vector2 {
 		//checkNaN();
 	}
 	
+	public boolean equals(Vector2 other)
+	{
+		return x == other.x && y == other.y;
+	}
+	
 	public Vector2 set(double x, double y)
 	{
 		this.x = x;
