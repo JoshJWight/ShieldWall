@@ -23,7 +23,7 @@ public class BattleModel {
 	private AI ai;
 	
 	//TODO have parameters governing number of guys, spacing, etc
-	public BattleModel(int nGuys)
+	public BattleModel(int nGuys, int nFactions)
 	{
 		
 		guys = new ArrayList<Guy>();
@@ -36,22 +36,50 @@ public class BattleModel {
 		
 		rand = new Random();
 		
-		int prepHeight = (int)(Math.sqrt(nGuys) * 5);
-		int prepWidth = (int)Math.sqrt(nGuys) * 10;
-		int noMansLand = 60;
+		double prepHeight = Math.sqrt(nGuys) * 10.0 / nFactions;
+		double prepWidth = Math.sqrt(nGuys) * 20.0 / nFactions;
+		double noMansLand = 0;
 		
-		int width = (int)(Math.sqrt(nGuys) * 5);
+		Color colors[] = {Color.RED, Color.BLUE, Color.GREEN, Color.LIGHT_GRAY, Color.YELLOW, Color.PINK, Color.CYAN};
+		//////////
+		double wedgeAngle = 2.0 * Math.PI/(double)nFactions;
+		double distToCorner = 0.5 * prepWidth / Math.sin(Math.PI / (double) nFactions);
 		
-		for(int i=0; i<nGuys; i++)
+		for(int i=0; i<nFactions; i++)
 		{
-			int rgb = (i%2==0) ? Color.RED.getRGB() : Color.BLUE.getRGB();
-			int initiative = rand.nextInt(attackCycle);
-			Guy guy = new Guy(rand.nextInt(prepWidth), rand.nextInt(prepHeight) + ((i%2)*(prepHeight + noMansLand)), initiative, rgb);
-			guys.add(guy);
-			xIndex.add(guy);
-			yIndex.add(guy);
+			double cornerAngle = i * wedgeAngle;
 			
-			guy.rgb = Colors.randomizeColor(guy.rgb);
+			//Corner that's used as the coordinate base offset from the one that determines the rotation angle
+			Vector2 corner = Vector2.zero().addPolar(distToCorner, (cornerAngle + wedgeAngle));
+			
+			System.out.println(i + ": cornerAngle " + cornerAngle + ", distToCorner " + distToCorner + 
+					", corner (" +  corner.x + ", " + corner.y + ")");
+			
+			corner.addPolar(noMansLand, cornerAngle);
+			
+			int rgb;
+			if(i < colors.length)
+			{
+				rgb = colors[i].getRGB();
+			}
+			else {
+				rgb = rand.nextInt();
+			}
+			
+			for(int j=0; j<nGuys/nFactions; j++)
+			{
+				int initiative = rand.nextInt(attackCycle);
+				double baseX = rand.nextDouble() * prepWidth;
+				double baseY = rand.nextDouble() * prepHeight;
+				Vector2 pos = new Vector2(baseX, baseY).rotate(cornerAngle).add(corner);
+				
+				Guy guy = new Guy(pos.x, pos.y, initiative, rgb);
+				guys.add(guy);
+				xIndex.add(guy);
+				yIndex.add(guy);
+				
+				guy.rgb = Colors.randomizeColor(guy.rgb); 
+			}
 		}
 		updateIndices();
 		
@@ -175,6 +203,15 @@ public class BattleModel {
 			if(guy.strafeTimer > 0)
 			{
 				guy.strafeTimer--;
+			}
+			
+			if(guy.group != null && guy.dist(guy.group.center) > guy.group.radius)
+			{
+				guy.awolTimer++;
+			}
+			else
+			{
+				guy.awolTimer = 0;
 			}
 		}
 		for(Group group: groups)

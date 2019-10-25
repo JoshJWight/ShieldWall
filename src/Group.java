@@ -74,7 +74,7 @@ public class Group {
 		for(int i=0; i<guys.size(); i++)
 		{
 			Guy guy = guys.get(i);
-			if(guy.hp <= 0 || guy.dist(center) > disengageRadius)
+			if(guy.hp <= 0 || guy.dist(center) > disengageRadius || guy.awolTimer >= Guy.maxAwolTimer)
 			{
 				remove(guy);
 				i--;

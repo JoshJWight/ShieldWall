@@ -6,8 +6,9 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-public class BattleDisplay extends JFrame implements KeyListener {
+public class BattleDisplay extends JPanel implements KeyListener {
 	public static final int START_WIDTH = 1000;
 	public static final int START_HEIGHT = 600;
 	
@@ -26,8 +27,8 @@ public class BattleDisplay extends JFrame implements KeyListener {
  	
 	public BattleDisplay(ArrayList<Guy> guys, ArrayList<Group> groups)
 	{
-		center = new Vector2(50, 50);
-		pixPerUnit = 10;
+		center = new Vector2(0, 0);
+		pixPerUnit = 1;
 		
 		this.guys = guys;
 		this.groups = groups;
@@ -47,16 +48,8 @@ public class BattleDisplay extends JFrame implements KeyListener {
 			shieldColors.add(new Color(1.0f - fraction, fraction, 1.0f - fraction));
 		}
 		
-		this.addWindowListener(new java.awt.event.WindowAdapter() {
-		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		    	System.exit(0);
-		    }
-		});
 		
-		this.setTitle("Shield Wall");
-		this.setSize(START_WIDTH, START_HEIGHT);
 		this.addKeyListener(this);
-		this.setVisible(true);
 	}
 	
 	//Convert to screen coords. Wanted short names since we'll use these a lot

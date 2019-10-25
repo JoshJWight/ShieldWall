@@ -42,6 +42,9 @@ public class Guy {
 	
 	public static final double halfShieldRad = Math.PI/3;
 	
+	public int awolTimer;
+	public static final int maxAwolTimer = 300;
+	
 	public Group group;
 	
 	public int xIndex;
