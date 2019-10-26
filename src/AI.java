@@ -279,7 +279,16 @@ public class AI {
 				}
 				else
 				{
-					group.target = new Vector2(group.center);
+					Group nearestActiveAlly = closestGroup(group, groups,
+							(Group me, Group other)->(other.factionRgb == me.factionRgb && !other.isReserves));
+					if(group.center.dist(nearestActiveAlly.center) > Group.reserveFollowDistance)
+					{
+						group.target = nearestActiveAlly.center;
+					}
+					else
+					{
+						group.target = new Vector2(group.center);
+					}
 				}
 			}
 			return;

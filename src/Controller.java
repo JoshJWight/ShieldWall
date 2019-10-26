@@ -42,6 +42,7 @@ public class Controller {
 		battleDisplay = new BattleDisplay(battleModel.guys, battleModel.groups);
 		gui.remove(menu);
 		gui.add(battleDisplay);
+		gui.revalidate();
 		
 		battleThread = new Thread() {
 			public void run() {

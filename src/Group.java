@@ -23,6 +23,7 @@ public class Group {
 	public boolean isDistressed;
 	
 	public static final double distressSearchRadius = 20;
+	public static final double reserveFollowDistance = 40;
 	
 	//Display
 	public int flashTimer;
