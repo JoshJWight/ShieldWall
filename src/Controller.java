@@ -71,7 +71,7 @@ public class Controller {
 			//System.out.println("Frame processing time: " +(midTime - startTime) + " + " + (endTime - midTime) + " = " + (endTime - startTime));
 			
 			try {
-				long sleep = Math.max((frameTimeMs - (endTime - startTime)), 0);
+				long sleep = Math.max((int)(frameTimeMs/battleDisplay.playbackSpeed) - (endTime - startTime), 0);
 				Thread.sleep(sleep);
 			} catch (InterruptedException e) {
 				e.printStackTrace();

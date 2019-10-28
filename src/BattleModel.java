@@ -38,7 +38,7 @@ public class BattleModel {
 		
 		double prepHeight = Math.sqrt(nGuys) * 10.0 / nFactions;
 		double prepWidth = Math.sqrt(nGuys) * 20.0 / nFactions;
-		double noMansLand = 0;
+		double noMansLand = 60;
 		
 		Color colors[] = {Color.RED, Color.BLUE, Color.GREEN, Color.LIGHT_GRAY, Color.YELLOW, Color.PINK, Color.CYAN};
 		//////////
@@ -56,7 +56,7 @@ public class BattleModel {
 			System.out.println(i + ": cornerAngle " + cornerAngle + ", distToCorner " + distToCorner + 
 					", corner (" +  corner.x + ", " + corner.y + ")");
 			
-			corner.addPolar(noMansLand, cornerAngle);
+			corner.addPolar(noMansLand, cornerAngle + wedgeAngle/2);
 			
 			int rgb;
 			if(i < colors.length)
@@ -167,16 +167,16 @@ public class BattleModel {
 		}
 	}
 	
-	private boolean isCollision(Guy guy, Vector2 newPos)
+	private Guy isCollision(Guy guy, Vector2 newPos)
 	{
 		for(Guy other: guysWithin(guy, Guy.personalSpace * 2.0))
 		{
 			if(other != guy && other.dist(newPos) < Guy.personalSpace && other.dist(guy.p) > Guy.personalSpace)
 			{
-				return true;
+				return other;
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	private void updateTimers()
@@ -244,16 +244,14 @@ public class BattleModel {
 		if(guy.hp > 0)
 		{
 			Vector2 newP = new Vector2(guy.p).add(guy.v);
-			
-			if(!isCollision(guy, newP))
+			Guy obstacle = isCollision(guy, newP);
+			if(obstacle == null)
 			{
 				guy.p = newP;
 			}
 			else
 			{
-				guy.v.mul(-1.0);
-				guy.strafeTimer = Guy.maxStrafeTimer;
-				guy.strafeRad = rand.nextBoolean() ? Guy.strafeMagnitude : - Guy.strafeMagnitude;
+				ai.strafeAI(guy, obstacle);
 			}
 		}
 	}

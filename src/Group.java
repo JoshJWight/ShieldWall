@@ -27,7 +27,7 @@ public class Group {
 	
 	//Display
 	public int flashTimer;
-	public static final int maxFlashTimer = 20;
+	public static final int maxFlashTimer = 60;
 	
 	//These values are computed on update
 	Vector2 center;

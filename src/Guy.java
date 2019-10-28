@@ -13,6 +13,7 @@ public class Guy {
 	
 	public int stam;
 	public static final int maxStam = 10;
+	public static final int stamRetreatThreshold = 2;
 	
 	public static final double radius = 1;
 	public static final double hpRadius = 0.5;
@@ -38,7 +39,7 @@ public class Guy {
 	public double strafeRad;
 	public int strafeTimer;
 	public static final int maxStrafeTimer = 10;
-	public static final double strafeMagnitude = Math.PI/8;
+	public static final double baseStrafeMagnitude = Math.PI/8;
 	
 	public static final double halfShieldRad = Math.PI/3;
 	

@@ -173,7 +173,7 @@ public class AI {
 		if(guy.group != null)
 		{
 			Group group = guy.group;
-			if(guy.stam <= Guy.maxStam / 5 && distToEnemy < safeDist)
+			if(guy.stam <= Guy.stamRetreatThreshold && distToEnemy < safeDist)
 			{
 				objective = flee(guy, enemies);
 			}
@@ -225,6 +225,31 @@ public class AI {
 		{
 			doAttack(guy, enemies);
 		}
+	}
+	
+	public void strafeAI(Guy guy, Guy obstacle)
+	{
+		guy.v.mul(-1.0);
+		
+		double magnitude;
+		if(obstacle.factionRgb == guy.factionRgb)
+		{
+			if(obstacle.stam <= Guy.stamRetreatThreshold)
+			{
+				magnitude = Guy.baseStrafeMagnitude * 3.0;
+			}
+			else
+			{
+				magnitude = Guy.baseStrafeMagnitude;
+			}
+		}
+		else
+		{
+			magnitude = Guy.baseStrafeMagnitude / 2.0;
+		}
+		
+		guy.strafeTimer = Guy.maxStrafeTimer;
+		guy.strafeRad = rand.nextBoolean() ? magnitude : - magnitude;
 	}
 	
 	private boolean groupIsOutnumbered(Group group, ArrayList<Group> groups)

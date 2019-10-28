@@ -18,6 +18,7 @@ public class BattleDisplay extends JPanel implements KeyListener {
 	
 	public Vector2 center;
 	public double pixPerUnit;
+	public double playbackSpeed;
 	
 	ArrayList<Guy> guys;
 	ArrayList<Group> groups;
@@ -29,6 +30,7 @@ public class BattleDisplay extends JPanel implements KeyListener {
 	{
 		center = new Vector2(0, 0);
 		pixPerUnit = 1;
+		playbackSpeed = 1;
 		
 		this.guys = guys;
 		this.groups = groups;
@@ -168,6 +170,7 @@ public class BattleDisplay extends JPanel implements KeyListener {
 		double moveScale = 100.0;
 		double moveAmount = moveScale / pixPerUnit;
 		double zoomScale = 0.1;
+		double playbackScale = 0.3;
 		switch(e.getKeyCode())
 		{
 		case KeyEvent.VK_DOWN:
@@ -188,6 +191,11 @@ public class BattleDisplay extends JPanel implements KeyListener {
 		case KeyEvent.VK_S:
 			pixPerUnit *= (1.0 - zoomScale);
 			break;
+		case KeyEvent.VK_A:
+			playbackSpeed *= (1.0 - playbackScale);
+			break;
+		case KeyEvent.VK_D:
+			playbackSpeed *= (1.0 + playbackScale);
 		default:
 			break;
 		}
