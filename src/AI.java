@@ -123,13 +123,6 @@ public class AI {
 	//TODO move the side effects on stamina and HP out of AI
 	private void doAttack(Guy guy, ArrayList<Guy> enemies)
 	{
-		//TODO feels awkward to have this logic here
-		if(guy.group != null && guy.group.isReserves)
-		{
-			guy.group.isReserves = false;
-			guy.group.idleness = 0;
-		}
-		
 		Vector2 targetPoint = new Vector2(guy.p).addPolar(Guy.attackReach, guy.bearingRad);
 		for(Guy enemy: enemies)
 		{
@@ -151,6 +144,13 @@ public class AI {
 				if(enemy.stam < Guy.maxStam)
 				{
 					enemy.stamRegenTimer = Guy.maxStamRegenTimer;
+				}
+				
+				//TODO feels awkward to have this logic here
+				if(guy.group != null && guy.group.isReserves)
+				{
+					guy.group.isReserves = false;
+					guy.group.idleness = 0;
 				}
 				break;
 			}

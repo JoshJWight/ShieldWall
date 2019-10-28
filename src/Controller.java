@@ -37,8 +37,9 @@ public class Controller {
 	public void menuStartHandler()
 	{
 		int nGuys = menu.getNGuys();
+		int nFactions = menu.getNFactions();
 		
-		battleModel = new BattleModel(nGuys, 6);
+		battleModel = new BattleModel(nGuys, nFactions);
 		battleDisplay = new BattleDisplay(battleModel.guys, battleModel.groups);
 		gui.remove(menu);
 		gui.add(battleDisplay);

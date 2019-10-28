@@ -47,7 +47,8 @@ public class BattleModel {
 		
 		for(int i=0; i<nFactions; i++)
 		{
-			double cornerAngle = i * wedgeAngle;
+			//Add 45 degrees so the two faction case works well with the x and y indices
+			double cornerAngle = i * wedgeAngle + Math.PI/4.0;
 			
 			//Corner that's used as the coordinate base offset from the one that determines the rotation angle
 			Vector2 corner = Vector2.zero().addPolar(distToCorner, (cornerAngle + wedgeAngle));
@@ -148,9 +149,11 @@ public class BattleModel {
 				for(Group other: groups)
 				{
 					if(other.isDistressed && other.factionRgb == group.factionRgb && 
-						group.center.dist(other.center) < Group.distressSearchRadius)
+						group.center.dist(other.center) < Group.distressSearchRadius * 1.5)
 					{
+						System.out.println("Reserves popping for rescue");
 						remove = true;
+						break;
 					}
 				}
 			}
