@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+@SuppressWarnings("serial")
 public class MenuScreen extends JPanel {
 	public static final int defaultNGuys = 4000;
 	public static final int defaultNFactions = 2;

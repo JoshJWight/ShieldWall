@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
 
@@ -17,11 +16,6 @@ public class AI {
 		{
 			this.velocity = velocity;
 			bearing = velocity.angle();
-		}
-		public Objective(Vector2 velocity, double bearing)
-		{
-			this.velocity = velocity;
-			this.bearing = bearing;
 		}
 	}
 	
@@ -276,6 +270,18 @@ public class AI {
 		return (double)enemyTotal / (double)allyTotal > enemyToAllyThreshold;
 	}
 	
+	private Group groupAtPoint(Vector2 p, ArrayList<Group> groups)
+	{
+		for(Group group: groups)
+		{
+			if(group.center.dist(p) < group.radius)
+			{
+				return group;
+			}
+		}
+		return null;
+	}
+	
 	public void groupAI(Group group, ArrayList<Group> groups)
 	{
 		if(group.isReserves)
@@ -286,7 +292,35 @@ public class AI {
 					(Group me, Group other)->(other.isDistressed && other.factionRgb == me.factionRgb));
 			if(nearestDistressedAlly != null)
 			{
-				group.target = nearestDistressedAlly.center;
+				double bearing = new Vector2(nearestDistressedAlly.center).sub(group.center).angle();
+				
+				double checkDist = group.disengageRadius + 5;
+				double sideAngle = Math.PI/4;
+				Vector2 center = new Vector2(group.center).addPolar(checkDist, bearing);
+				Vector2 right = new Vector2(group.center).addPolar(checkDist, bearing + sideAngle);
+				Vector2 left = new Vector2(group.center).addPolar(checkDist, bearing - sideAngle);
+				
+				Group centerGroup = groupAtPoint(center, groups);
+				Group rightGroup = groupAtPoint(right, groups);
+				Group leftGroup = groupAtPoint(left, groups);
+				
+				if(centerGroup == null || centerGroup == nearestDistressedAlly)
+				{
+					group.target = new Vector2(nearestDistressedAlly.center);
+				}
+				else if(rightGroup == null)
+				{
+					group.target = right;
+				}
+				else if(leftGroup == null)
+				{
+					group.target = left;
+				}
+				//If every path is blocked, just try to barge on through
+				else 
+				{
+					group.target = new Vector2(nearestDistressedAlly.center);
+				}
 			}
 			else
 			{

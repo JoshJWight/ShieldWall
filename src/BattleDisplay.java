@@ -4,10 +4,9 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class BattleDisplay extends JPanel implements KeyListener {
 	public static final int START_WIDTH = 1000;
 	public static final int START_HEIGHT = 600;

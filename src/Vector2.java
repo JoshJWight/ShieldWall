@@ -134,6 +134,7 @@ public class Vector2 {
 		return Math.atan2(y, x);
 	}
 	
+	@SuppressWarnings("unused")
 	private void checkNaN()
 	{
 		if(Double.isNaN(x) || Double.isNaN(x))

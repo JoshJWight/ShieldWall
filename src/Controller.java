@@ -61,14 +61,10 @@ public class Controller {
 			
 			battleModel.update();
 			
-			long midTime = System.currentTimeMillis();
-			
 			battleDisplay.requestFocus();
 			battleDisplay.repaint();
 			
 			long endTime = System.currentTimeMillis();
-			
-			//System.out.println("Frame processing time: " +(midTime - startTime) + " + " + (endTime - midTime) + " = " + (endTime - startTime));
 			
 			try {
 				long sleep = Math.max((int)(frameTimeMs/battleDisplay.playbackSpeed) - (endTime - startTime), 0);
