@@ -55,7 +55,12 @@ public class Controller {
 	
 	public void runBattle(int nGuys)
 	{
-		while(true)
+		long lastFrameCheck = System.currentTimeMillis();
+		int framesInInterval = 0;
+		
+		long endTimer = 0;
+		final long maxEndTimer = 5000;
+		while(endTimer < maxEndTimer)
 		{
 			long startTime = System.currentTimeMillis();
 			
@@ -66,12 +71,34 @@ public class Controller {
 			
 			long endTime = System.currentTimeMillis();
 			
+			long sleepTime = Math.max((long)(frameTimeMs/battleDisplay.playbackSpeed) - (endTime - startTime), 0);
 			try {
-				long sleep = Math.max((int)(frameTimeMs/battleDisplay.playbackSpeed) - (endTime - startTime), 0);
-				Thread.sleep(sleep);
+				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			
+			if(endTime - lastFrameCheck >= 1000)
+			{
+				battleDisplay.framesPerSecond = (int)Math.round(framesInInterval * 1000.0 / (double)(endTime - lastFrameCheck));
+				lastFrameCheck = endTime;
+				framesInInterval = 0;
+			}
+			
+			if(battleModel.winner() != null)
+			{
+				battleDisplay.winnerRgb = battleModel.winner().factionRgb;
+				battleDisplay.winnerName = battleModel.factionName(battleDisplay.winnerRgb);
+				
+				long timeElapsed = (endTime - startTime) + sleepTime;
+				endTimer += timeElapsed;
+			}	
+			
+			framesInInterval ++;
 		}
+		gui.remove(battleDisplay);
+		gui.add(menu);
+		gui.revalidate();
+		menu.repaint();
 	}
 }

@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Random;
 
 
@@ -10,6 +12,8 @@ public class BattleModel {
 	
 	public ArrayList<Guy> guys;
 	public ArrayList<Group> groups;
+	
+	private HashMap<Integer, String> factionNames;
 	
 	private ArrayList<Guy> xIndex;
 	private ArrayList<Guy> yIndex;
@@ -39,10 +43,12 @@ public class BattleModel {
 		double prepWidth = Math.sqrt(nGuys) * 20.0 / nFactions;
 		double noMansLand = 60;
 		
-		Color colors[] = {Color.RED, Color.BLUE, Color.GREEN, Color.LIGHT_GRAY, Color.YELLOW, Color.PINK, Color.CYAN};
-		//////////
+		makeFactionNames();
+		
 		double wedgeAngle = 2.0 * Math.PI/(double)nFactions;
 		double distToCorner = 0.5 * prepWidth / Math.sin(Math.PI / (double) nFactions);
+		
+		Iterator<Integer> rgbIt = factionNames.keySet().iterator();
 		
 		for(int i=0; i<nFactions; i++)
 		{
@@ -58,9 +64,9 @@ public class BattleModel {
 			corner.addPolar(noMansLand, cornerAngle + wedgeAngle/2);
 			
 			int rgb;
-			if(i < colors.length)
+			if(rgbIt.hasNext())
 			{
-				rgb = colors[i].getRGB();
+				rgb = rgbIt.next();
 			}
 			else {
 				rgb = rand.nextInt();
@@ -84,6 +90,26 @@ public class BattleModel {
 		updateIndices();
 		
 		makeGroups();
+	}
+	
+	private void makeFactionNames()
+	{
+		factionNames = new HashMap<Integer, String>();
+		factionNames.put(Color.red.getRGB(), "Red");
+		factionNames.put(Color.blue.getRGB(), "Blue");
+		factionNames.put(Color.green.getRGB(), "Green");
+		factionNames.put(Color.yellow.getRGB(), "Yellow");
+		factionNames.put(Color.magenta.getRGB(), "Magenta");
+		factionNames.put(Color.cyan.getRGB(), "Cyan");
+	}
+	
+	public String factionName(int factionRgb)
+	{
+		if(factionNames.containsKey(factionRgb))
+		{
+			return factionNames.get(factionRgb);
+		}
+		return "Extra";
 	}
 	
 	private void makeGroups()
@@ -397,5 +423,19 @@ public class BattleModel {
 		}
 		
 		return neighbors;
+	}
+	
+	public Group winner()
+	{
+		//Hopefully we never get a situation where the last two groups break simultaneously
+		Group winner = groups.get(0);
+		for(Group group: groups)
+		{
+			if(group.factionRgb != winner.factionRgb)
+			{
+				return null;
+			}
+		}
+		return winner;
 	}
 }

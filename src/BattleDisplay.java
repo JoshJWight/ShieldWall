@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -19,11 +20,18 @@ public class BattleDisplay extends JPanel implements KeyListener {
 	public double pixPerUnit;
 	public double playbackSpeed;
 	
-	ArrayList<Guy> guys;
-	ArrayList<Group> groups;
+	//playbackSpeed is the intended speed, framesPerSecond is the measured speed
 	
-	ArrayList<Color> hpColors;
-	ArrayList<Color> shieldColors;
+	public int framesPerSecond;
+	
+	public int winnerRgb;
+	public String winnerName;
+	
+	private ArrayList<Guy> guys;
+	private ArrayList<Group> groups;
+	
+	private ArrayList<Color> hpColors;
+	private ArrayList<Color> shieldColors;
  	
 	public BattleDisplay(ArrayList<Guy> guys, ArrayList<Group> groups)
 	{
@@ -160,6 +168,17 @@ public class BattleDisplay extends JPanel implements KeyListener {
 					sy(group.center.y - group.radius),
 					ss(group.radius * 2),
 					ss(group.radius * 2));
+		}
+		
+		g.setFont(new Font("Helvetica", 0, 20));
+		g.setColor(Color.yellow);
+		g.drawString("Speed: " + framesPerSecond * 2 + " %", 10, 30);
+		
+		if(winnerName != null)
+		{
+			g.setFont(new Font("Helvetica", 0, 50));
+			g.setColor(new Color(winnerRgb));
+			g.drawString(winnerName + " Faction Wins!", getWidth()/4, getHeight()/2 - 40);
 		}
 		
 		graphics.drawImage(image, 0, 0, null);
